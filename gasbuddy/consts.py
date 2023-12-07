@@ -6,7 +6,7 @@ DEFAULT_HEADERS = {
     "Content-Type": "application/json",
 }
 
-GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { prices { credit { nickname postedTime price } } } }"
+GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { prices { credit { nickname postedTime price } fuelProduct longName } priceUnit } }"
 LOCATION_QUERY = """
 query LocationBySearchTerm($brandId: Int, $cursor: String, $fuel: Int, $lat: Float, $lng: Float, $maxAge: Int, $search: String) {
   locationBySearchTerm(lat: $lat, lng: $lng, search: $search) {

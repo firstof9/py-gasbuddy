@@ -23,7 +23,7 @@ async def test_location_search(mock_aioclient):
         status=200,
         body=load_fixture("location.json"),
     )
-    data = await gasbuddy.GasBuddy().location_search(12345)
+    data = await gasbuddy.GasBuddy().location_search(zip=12345)
 
     assert (
         data["data"]["locationBySearchTerm"]["stations"]["results"][0]["id"] == "187725"
@@ -36,8 +36,19 @@ async def test_location_search_timeout(mock_aioclient, caplog):
         exception=ServerTimeoutError,
     )
     with caplog.at_level(logging.DEBUG):
-        await gasbuddy.GasBuddy().location_search(12345)
+        await gasbuddy.GasBuddy().location_search(zip=12345)
     assert gasbuddy.ERROR_TIMEOUT in caplog.text
+
+async def test_location_search_exception(mock_aioclient):
+    """Test location_search function."""
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("location.json"),
+    )
+    with pytest.raises(gasbuddy.MissingSearchData):
+        await gasbuddy.GasBuddy().location_search()    
+
 
 async def test_price_lookup(mock_aioclient)    :
     """Test price_lookup function."""

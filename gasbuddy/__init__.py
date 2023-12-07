@@ -22,12 +22,14 @@ class GasBuddy:
         self._url = BASE_URL
         self._id = station_id
 
-    async def process_request(self, query: dict[str, Collection[str]]) -> dict[str, str] | dict[str, Any]:
+    async def process_request(
+        self, query: dict[str, Collection[str]]
+    ) -> dict[str, str] | dict[str, Any]:
         """Process API requests."""
         async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
             try:
                 async with session.post(self._url, data=query) as response:
-                    message: dict[str, Any]|Any = {}
+                    message: dict[str, Any] | Any = {}
                     try:
                         message = await response.text()
                     except UnicodeDecodeError:
@@ -55,17 +57,28 @@ class GasBuddy:
                 message = {"msg": ERROR_TIMEOUT}
             except ContentTypeError as err:
                 _LOGGER.error("%s", err)
-                message = {"msg": err}                
+                message = {"msg": err}
 
             await session.close()
             return message
 
-    async def location_search(self, zip: int) -> dict[str, str] | dict[str, Any]:
+    async def location_search(
+        self, lat: float | None = None, lon: float | None = None, zip: int | None = None
+    ) -> dict[str, str] | dict[str, Any]:
         """Return result of location search."""
+        variables = {}
+        if lat is not None and lon is not None:
+            variables = {"maxAge": 0, "lat": lat, "lng": lon}
+        elif zip is not None:
+            variables = {"maxAge": 0, "search": str(zip)}
+        else:
+            _LOGGER.error("Missing search data.")
+            raise MissingSearchData
+
         query = {
             "operationName": "LocationBySearchTerm",
             "query": LOCATION_QUERY,
-            "variables": {"fuel": 1, "maxAge": 0, "search": str(zip)},
+            "variables": variables,
         }
 
         return await self.process_request(query)
@@ -80,3 +93,7 @@ class GasBuddy:
         }
 
         return await self.process_request(query)
+
+
+class MissingSearchData(Exception):
+    """Exception for missing search data variable."""
