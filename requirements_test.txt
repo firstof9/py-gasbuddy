@@ -2,7 +2,7 @@
 pre-commit==3.3.3
 pytest==7.4.0
 pytest-cov==4.1.0
-pytest-timeout==2.1.0
+pytest-timeout==2.2.0
 pytest-asyncio
 requests_mock
 aiohttp
