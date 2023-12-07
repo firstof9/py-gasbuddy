@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any
+from typing import Any, Collection
 
 import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
@@ -22,22 +22,24 @@ class GasBuddy:
         self._url = BASE_URL
         self._id = station_id
 
-    async def process_request(self, query: str) -> dict[str, str] | dict[str, Any]:
+    async def process_request(self, query: dict[str, Collection[str]]) -> dict[str, str] | dict[str, Any]:
         """Process API requests."""
         async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
             try:
                 async with session.post(self._url, data=query) as response:
+                    message: dict[str, Any]|Any = {}
                     try:
                         message = await response.text()
                     except UnicodeDecodeError:
                         _LOGGER.debug("Decoding error.")
-                        message = await response.read()
-                        message = message.decode(errors="replace")
+                        data = await response.read()
+                        message = data.decode(errors="replace")
 
                     try:
                         message = json.loads(message)
                     except ValueError:
                         _LOGGER.warning("Non-JSON response: %s", message)
+                        message = {"error": message}
 
                     if response.status != 200:
                         _LOGGER.error(
@@ -45,12 +47,18 @@ class GasBuddy:
                             response.status,
                             message,
                         )
-
+                        message = {"error": message}
                     return message
+
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
+                message = {"msg": ERROR_TIMEOUT}
+            except ContentTypeError as err:
+                _LOGGER.error("%s", err)
+                message = {"msg": err}                
 
             await session.close()
+            return message
 
     async def location_search(self, zip: int) -> dict[str, str] | dict[str, Any]:
         """Return result of location search."""
