@@ -2,8 +2,8 @@
 
 BASE_URL = "https://www.gasbuddy.com/graphql"
 
-DEFAULT_HEADERS={
-    'Content-Type': 'application/json',
+DEFAULT_HEADERS = {
+    "Content-Type": "application/json",
 }
 
 GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { prices { credit { nickname postedTime price } } } }"

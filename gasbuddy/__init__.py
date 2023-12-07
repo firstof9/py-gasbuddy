@@ -13,19 +13,20 @@ from .consts import BASE_URL, DEFAULT_HEADERS, GAS_PRICE_QUERY, LOCATION_QUERY
 ERROR_TIMEOUT = "Timeout while updating"
 _LOGGER = logging.getLogger(__name__)
 
+
 class GasBuddy:
     """Represent GasBuddy GraphQL calls."""
 
-    def __init__(self, station_id: int) -> None:
+    def __init__(self, station_id: int | None = None) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
         self._id = station_id
 
     async def process_request(self, query: str) -> dict[str, str] | dict[str, Any]:
         """Process API requests."""
-        async with aiohttp.ClientSession(haders=DEFAULT_HEADERS) as session:
+        async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
             try:
-                async with session(self._url,data=query).post as response:
+                async with session.post(self._url, data=query) as response:
                     try:
                         message = await response.text()
                     except UnicodeDecodeError:
@@ -37,26 +38,37 @@ class GasBuddy:
                         message = json.loads(message)
                     except ValueError:
                         _LOGGER.warning("Non-JSON response: %s", message)
-                    
+
                     if response.status != 200:
-                        _LOGGER.error("An error reteiving data from the server, code: %s\nmessage: %s", response.status, message)
+                        _LOGGER.error(
+                            "An error reteiving data from the server, code: %s\nmessage: %s",
+                            response.status,
+                            message,
+                        )
 
                     return message
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
-            
+
             await session.close()
-            return message
 
     async def location_search(self, zip: int) -> dict[str, str] | dict[str, Any]:
         """Return result of location search."""
-        query = {"operationName": "LocationBySearchTerm", 'query': LOCATION_QUERY, 'variables': {'fuel': 1, 'maxAge': 0, 'search': str(zip)}}
+        query = {
+            "operationName": "LocationBySearchTerm",
+            "query": LOCATION_QUERY,
+            "variables": {"fuel": 1, "maxAge": 0, "search": str(zip)},
+        }
 
         return await self.process_request(query)
-    
+
     async def price_lookup(self) -> dict[str, str] | dict[str, Any]:
         """Return gas price of station_id."""
 
-        query = {"operationName": "GetStation", "query": GAS_PRICE_QUERY, "variables": {"id": str(self._id)}}
-        
+        query = {
+            "operationName": "GetStation",
+            "query": GAS_PRICE_QUERY,
+            "variables": {"id": str(self._id)},
+        }
+
         return await self.process_request(query)
