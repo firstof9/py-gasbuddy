@@ -38,3 +38,15 @@ async def test_location_search_timeout(mock_aioclient, caplog):
     with caplog.at_level(logging.DEBUG):
         await gasbuddy.GasBuddy().location_search(12345)
     assert gasbuddy.ERROR_TIMEOUT in caplog.text
+
+async def test_price_lookup(mock_aioclient)    :
+    """Test price_lookup function."""
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("station.json"),
+    )    
+    data = await gasbuddy.GasBuddy(station_id=208656).price_lookup()
+
+    assert data["data"]["station"]["id"] == "208656"
+    assert data["data"]["station"]["prices"][0]["credit"]["price"] == 2.99
