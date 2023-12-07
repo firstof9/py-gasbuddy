@@ -63,14 +63,14 @@ class GasBuddy:
             return message
 
     async def location_search(
-        self, lat: float | None = None, lon: float | None = None, zip: int | None = None
+        self, lat: float | None = None, lon: float | None = None, zipcode: int | None = None
     ) -> dict[str, str] | dict[str, Any]:
         """Return result of location search."""
         variables = {}
         if lat is not None and lon is not None:
             variables = {"maxAge": 0, "lat": lat, "lng": lon}
         elif zip is not None:
-            variables = {"maxAge": 0, "search": str(zip)}
+            variables = {"maxAge": 0, "search": str(zipcode)}
         else:
             _LOGGER.error("Missing search data.")
             raise MissingSearchData

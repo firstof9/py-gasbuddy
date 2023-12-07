@@ -38,75 +38,11 @@ query LocationBySearchTerm($brandId: Int, $cursor: String, $fuel: Int, $lat: Flo
           region
           __typename
         }
-        badges {
-          badgeId
-          callToAction
-          campaignId
-          clickTrackingUrl
-          description
-          detailsImageUrl
-          detailsImpressionTrackingUrls
-          imageUrl
-          impressionTrackingUrls
-          targetUrl
-          title
-          __typename
-        }
-        brandings {
-          brandId
-          brandingType
-          __typename
-        }
-        brands {
-          brandId
-          imageUrl
-          name
-          __typename
-        }
         distance
-        emergencyStatus {
-          hasDiesel {
-            nickname
-            reportStatus
-            updateDate
-            __typename
-          }
-          hasGas {
-            nickname
-            reportStatus
-            updateDate
-            __typename
-          }
-          hasPower {
-            nickname
-            reportStatus
-            updateDate
-            __typename
-          }
-          __typename
-        }
         enterprise
         fuels
         id
         name
-        offers {
-          discounts {
-            grades
-            highlight
-            pwgbDiscount
-            receiptDiscount
-            __typename
-          }
-          highlight
-          id
-          types
-          use
-          __typename
-        }
-        payStatus {
-          isPayAvailable
-          __typename
-        }
         prices {
           cash {
             nickname
@@ -127,18 +63,8 @@ query LocationBySearchTerm($brandId: Int, $cursor: String, $fuel: Int, $lat: Flo
           __typename
         }
         priceUnit
-        ratingsCount
-        starRating
         __typename
       }
-      __typename
-    }
-    trends {
-      areaName
-      country
-      today
-      todayLow
-      trend
       __typename
     }
     __typename
