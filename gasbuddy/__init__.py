@@ -69,7 +69,7 @@ class GasBuddy:
         zipcode: int | None = None,
     ) -> dict[str, str] | dict[str, Any]:
         """Return result of location search."""
-        variables = {}
+        variables: dict[str, Any] = {}
         if lat is not None and lon is not None:
             variables = {"maxAge": 0, "lat": lat, "lng": lon}
         elif zipcode is not None:
