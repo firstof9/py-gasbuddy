@@ -69,7 +69,7 @@ class GasBuddy:
         variables = {}
         if lat is not None and lon is not None:
             variables = {"maxAge": 0, "lat": lat, "lng": lon}
-        elif zip is not None:
+        elif zipcode is not None:
             variables = {"maxAge": 0, "search": str(zipcode)}
         else:
             _LOGGER.error("Missing search data.")
