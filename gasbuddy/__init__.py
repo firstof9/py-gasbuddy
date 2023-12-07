@@ -63,7 +63,10 @@ class GasBuddy:
             return message
 
     async def location_search(
-        self, lat: float | None = None, lon: float | None = None, zipcode: int | None = None
+        self,
+        lat: float | None = None,
+        lon: float | None = None,
+        zipcode: int | None = None,
     ) -> dict[str, str] | dict[str, Any]:
         """Return result of location search."""
         variables = {}
