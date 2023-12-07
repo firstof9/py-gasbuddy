@@ -1,5 +1,5 @@
 """Constants for the py-gasbuddy GraphQL library."""
-
+# flake8: noqa
 BASE_URL = "https://www.gasbuddy.com/graphql"
 
 DEFAULT_HEADERS = {

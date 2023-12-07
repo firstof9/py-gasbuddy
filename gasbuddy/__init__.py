@@ -44,8 +44,8 @@ class GasBuddy:
                         message = {"error": message}
 
                     if response.status != 200:
-                        _LOGGER.error(
-                            "An error reteiving data from the server, code: %s\nmessage: %s",
+                        _LOGGER.error(  # pylint: disable-next=line-too-long
+                            "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
                             response.status,
                             message,
                         )
