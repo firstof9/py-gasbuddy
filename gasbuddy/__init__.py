@@ -88,7 +88,6 @@ class GasBuddy:
 
     async def price_lookup(self) -> dict[str, str] | dict[str, Any]:
         """Return gas price of station_id."""
-
         query = {
             "operationName": "GetStation",
             "query": GAS_PRICE_QUERY,
