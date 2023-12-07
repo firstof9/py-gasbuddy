@@ -1,14 +1,9 @@
 """Library tests."""
 
-import aiohttp
-import asyncio
-import json
-import logging
-from unittest import mock
-
-import pytest
+from aiohttp.client_exceptions import ServerTimeoutError
 import gasbuddy
-from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
+import logging
+import pytest
 from tests.common import load_fixture
 
 pytestmark = pytest.mark.asyncio
