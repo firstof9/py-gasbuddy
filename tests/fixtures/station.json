@@ -1,0 +1,1251 @@
+{
+    "data": {
+        "station": {
+            "address": {
+                "country": "US",
+                "line1": "1101 N Verrado Way",
+                "line2": "",
+                "locality": "Buckeye",
+                "postalCode": "85326",
+                "region": "AZ",
+                "__typename": "Address"
+            },
+            "amenities": [
+                {
+                    "amenityId": "membership_required",
+                    "imageUrl": "https://images.gasbuddy.com/di/features/v2/22.png",
+                    "name": "Membership Required",
+                    "__typename": "Amenity"
+                }
+            ],
+            "badges": [],
+            "brandings": [
+                {
+                    "brandId": "38",
+                    "brandingType": "cstore",
+                    "__typename": "Branding"
+                },
+                {
+                    "brandId": "38",
+                    "brandingType": "fuel",
+                    "__typename": "Branding"
+                }
+            ],
+            "brands": [
+                {
+                    "brandId": "38",
+                    "brandingType": "cstore",
+                    "imageUrl": "https://images.gasbuddy.io/b/38.png",
+                    "name": "Costco",
+                    "__typename": "Brand"
+                },
+                {
+                    "brandId": "38",
+                    "brandingType": "cstore",
+                    "imageUrl": "https://images.gasbuddy.io/b/38.png",
+                    "name": "Costco",
+                    "__typename": "Brand"
+                }
+            ],
+            "currency": "USD",
+            "emergencyStatus": null,
+            "enterprise": true,
+            "fuels": [
+                "regular_gas",
+                "premium_gas"
+            ],
+            "hours": null,
+            "id": "208656",
+            "latitude": 33.459108,
+            "longitude": -112.502745,
+            "name": "Costco",
+            "nearby": [
+                {
+                    "address": {
+                        "country": "US",
+                        "line1": "1520 N Verrado Way",
+                        "locality": "Buckeye",
+                        "postalCode": "85396",
+                        "region": "AZ",
+                        "__typename": "Address"
+                    },
+                    "amenities": [
+                        {
+                            "amenityId": "propane",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/8.png",
+                            "name": "Propane",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "c_store",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/9.png",
+                            "name": "C-Store",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "carwash",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/10.png",
+                            "name": "Car Wash",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "pay_at_pump",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/11.png",
+                            "name": "Pay At Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "restrooms",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/13.png",
+                            "name": "Restrooms",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "air",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/14.png",
+                            "name": "Air Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "payphone",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/15.png",
+                            "name": "Payphone",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "atm",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/16.png",
+                            "name": "ATM",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "lotto",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/25.png",
+                            "name": "Lotto",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "beer",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/28.png",
+                            "name": "Beer",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "wine",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/29.png",
+                            "name": "Wine",
+                            "__typename": "Amenity"
+                        }
+                    ],
+                    "badges": [],
+                    "brands": [
+                        {
+                            "brandId": "122",
+                            "brandingType": "fuel",
+                            "imageUrl": "https://images.gasbuddy.io/b/122.png",
+                            "name": "Shell",
+                            "__typename": "Brand"
+                        }
+                    ],
+                    "distance": "0.45mi",
+                    "emergencyStatus": null,
+                    "enterprise": false,
+                    "fuels": [
+                        "regular_gas",
+                        "midgrade_gas",
+                        "premium_gas",
+                        "diesel"
+                    ],
+                    "id": "187725",
+                    "latitude": 33.465405037595,
+                    "longitude": -112.505053281784,
+                    "name": "Shell",
+                    "offers": [
+                        {
+                            "discounts": [
+                                {
+                                    "grades": [
+                                        "regular_gas",
+                                        "diesel"
+                                    ],
+                                    "highlight": "Deal Alert: Save 3¢ per gallon",
+                                    "pwgbDiscount": "0.03",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                },
+                                {
+                                    "grades": [
+                                        "midgrade_gas",
+                                        "premium_gas"
+                                    ],
+                                    "highlight": "Deal Alert: Save 4¢ per gallon",
+                                    "pwgbDiscount": "0.04",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                }
+                            ],
+                            "highlight": "Deal Alert: Save up to 4¢ per gallon",
+                            "id": "H5187725-3-4-4-3-H3kCavWcaqvgXjurVZoIz8d",
+                            "types": [
+                                "gasbuddy"
+                            ],
+                            "use": [
+                                "strike",
+                                "sort"
+                            ],
+                            "__typename": "Offer"
+                        }
+                    ],
+                    "payStatus": null,
+                    "prices": [
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:39:07.388Z",
+                                "price": 3.43,
+                                "formattedPrice": "$3.43",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "regular_gas",
+                            "longName": "Regular",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:39:07.419Z",
+                                "price": 3.94,
+                                "formattedPrice": "$3.94",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "midgrade_gas",
+                            "longName": "Midgrade",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:39:07.435Z",
+                                "price": 4.29,
+                                "formattedPrice": "$4.29",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "premium_gas",
+                            "longName": "Premium",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:39:07.466Z",
+                                "price": 3.69,
+                                "formattedPrice": "$3.69",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "diesel",
+                            "longName": "Diesel",
+                            "__typename": "PriceReport"
+                        }
+                    ],
+                    "priceUnit": "dollars_per_gallon",
+                    "ratingsCount": 207,
+                    "reviews": {
+                        "results": [
+                            {
+                                "hasAgreed": false,
+                                "isReportable": false,
+                                "memberId": "MrLefty0706",
+                                "overallRating": 2,
+                                "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=Z0NsCihsqnqih962N6vVnDDK8PXSYwLg%2fUwrxIi0ifUOsVNDgedx3g%3d%3d",
+                                "replies": [],
+                                "review": "The service is great but the gas prices are the highest in the area.  Why?",
+                                "reviewDate": "2023-04-20T19:24:09.207Z",
+                                "reviewId": "10064234",
+                                "__typename": "Review"
+                            }
+                        ],
+                        "__typename": "ReviewResults"
+                    },
+                    "starRating": 4.4,
+                    "__typename": "Station"
+                },
+                {
+                    "address": {
+                        "country": "US",
+                        "line1": "721 N 195th Ave",
+                        "locality": "Buckeye",
+                        "postalCode": "85326-9730",
+                        "region": "AZ",
+                        "__typename": "Address"
+                    },
+                    "amenities": [
+                        {
+                            "amenityId": "c_store",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/9.png",
+                            "name": "C-Store",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "pay_at_pump",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/11.png",
+                            "name": "Pay At Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "air",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/14.png",
+                            "name": "Air Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "atm",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/16.png",
+                            "name": "ATM",
+                            "__typename": "Amenity"
+                        }
+                    ],
+                    "badges": [],
+                    "brands": [
+                        {
+                            "brandId": "32",
+                            "brandingType": "cstore",
+                            "imageUrl": "https://images.gasbuddy.io/b/32.png",
+                            "name": "Circle K",
+                            "__typename": "Brand"
+                        }
+                    ],
+                    "distance": "1.43mi",
+                    "emergencyStatus": null,
+                    "enterprise": false,
+                    "fuels": [
+                        "regular_gas",
+                        "midgrade_gas",
+                        "premium_gas",
+                        "diesel"
+                    ],
+                    "id": "110402",
+                    "latitude": 33.45521911375,
+                    "longitude": -112.47843503952,
+                    "name": "Circle K",
+                    "offers": [
+                        {
+                            "discounts": [
+                                {
+                                    "grades": [
+                                        "regular_gas",
+                                        "diesel"
+                                    ],
+                                    "highlight": "Deal Alert: Save 3¢ per gallon",
+                                    "pwgbDiscount": "0.03",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                },
+                                {
+                                    "grades": [
+                                        "midgrade_gas",
+                                        "premium_gas"
+                                    ],
+                                    "highlight": "Deal Alert: Save 4¢ per gallon",
+                                    "pwgbDiscount": "0.04",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                }
+                            ],
+                            "highlight": "Deal Alert: Save up to 4¢ per gallon",
+                            "id": "H5110402-3-4-4-3-HdM3NbWWLUbWuc2uiiIpDfO",
+                            "types": [
+                                "gasbuddy"
+                            ],
+                            "use": [
+                                "strike",
+                                "sort"
+                            ],
+                            "__typename": "Offer"
+                        }
+                    ],
+                    "payStatus": null,
+                    "prices": [
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:48:04.935Z",
+                                "price": 3.45,
+                                "formattedPrice": "$3.45",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "regular_gas",
+                            "longName": "Regular",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:48:04.951Z",
+                                "price": 3.77,
+                                "formattedPrice": "$3.77",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "midgrade_gas",
+                            "longName": "Midgrade",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:48:04.975Z",
+                                "price": 4.05,
+                                "formattedPrice": "$4.05",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "premium_gas",
+                            "longName": "Premium",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:48:04.980Z",
+                                "price": 3.65,
+                                "formattedPrice": "$3.65",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "diesel",
+                            "longName": "Diesel",
+                            "__typename": "PriceReport"
+                        }
+                    ],
+                    "priceUnit": "dollars_per_gallon",
+                    "ratingsCount": 158,
+                    "reviews": {
+                        "results": [
+                            {
+                                "hasAgreed": false,
+                                "isReportable": false,
+                                "memberId": "Ohmagic",
+                                "overallRating": 2,
+                                "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=IqicHg7OHXDvPi6ZiPQHsY8VXQ2oBiyFCAFX5faau2d4BvTm0pzylQ%3d%3d",
+                                "replies": [],
+                                "review": "Always crowded",
+                                "reviewDate": "2020-02-17T15:11:29.01Z",
+                                "reviewId": "6576887",
+                                "__typename": "Review"
+                            }
+                        ],
+                        "__typename": "ReviewResults"
+                    },
+                    "starRating": 3.9,
+                    "__typename": "Station"
+                },
+                {
+                    "address": {
+                        "country": "US",
+                        "line1": "1419 N 195th Ave",
+                        "locality": "Buckeye",
+                        "postalCode": "85396-6672",
+                        "region": "AZ",
+                        "__typename": "Address"
+                    },
+                    "amenities": [
+                        {
+                            "amenityId": "propane",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/8.png",
+                            "name": "Propane",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "c_store",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/9.png",
+                            "name": "C-Store",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "carwash",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/10.png",
+                            "name": "Car Wash",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "pay_at_pump",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/11.png",
+                            "name": "Pay At Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "restrooms",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/13.png",
+                            "name": "Restrooms",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "air",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/14.png",
+                            "name": "Air Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "payphone",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/15.png",
+                            "name": "Payphone",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "atm",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/16.png",
+                            "name": "ATM",
+                            "__typename": "Amenity"
+                        }
+                    ],
+                    "badges": [],
+                    "brands": [
+                        {
+                            "brandId": "31",
+                            "brandingType": "fuel",
+                            "imageUrl": "https://images.gasbuddy.io/b/31.png",
+                            "name": "Chevron",
+                            "__typename": "Brand"
+                        }
+                    ],
+                    "distance": "1.44mi",
+                    "emergencyStatus": null,
+                    "enterprise": false,
+                    "fuels": [
+                        "regular_gas",
+                        "midgrade_gas",
+                        "premium_gas",
+                        "diesel"
+                    ],
+                    "id": "87490",
+                    "latitude": 33.463606029106,
+                    "longitude": -112.478361278772,
+                    "name": "Chevron",
+                    "offers": [
+                        {
+                            "discounts": [
+                                {
+                                    "grades": [
+                                        "regular_gas"
+                                    ],
+                                    "highlight": "Deal Alert: Save 3¢ per gallon",
+                                    "pwgbDiscount": "0.03",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                },
+                                {
+                                    "grades": [
+                                        "midgrade_gas",
+                                        "premium_gas",
+                                        "diesel"
+                                    ],
+                                    "highlight": "Deal Alert: Save 4¢ per gallon",
+                                    "pwgbDiscount": "0.04",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                }
+                            ],
+                            "highlight": "Deal Alert: Save up to 4¢ per gallon",
+                            "id": "H587490-3-4-4-4-H8OfXoh6oXNY0Mpd8mCUdwM",
+                            "types": [
+                                "gasbuddy"
+                            ],
+                            "use": [
+                                "strike",
+                                "sort"
+                            ],
+                            "__typename": "Offer"
+                        }
+                    ],
+                    "payStatus": null,
+                    "prices": [
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:47:46.965Z",
+                                "price": 3.65,
+                                "formattedPrice": "$3.65",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "regular_gas",
+                            "longName": "Regular",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:47:46.981Z",
+                                "price": 3.95,
+                                "formattedPrice": "$3.95",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "midgrade_gas",
+                            "longName": "Midgrade",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:47:47.011Z",
+                                "price": 4.25,
+                                "formattedPrice": "$4.25",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "premium_gas",
+                            "longName": "Premium",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Reddfoxx13",
+                                "postedTime": "2023-12-07T07:47:47.027Z",
+                                "price": 3.99,
+                                "formattedPrice": "$3.99",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "diesel",
+                            "longName": "Diesel",
+                            "__typename": "PriceReport"
+                        }
+                    ],
+                    "priceUnit": "dollars_per_gallon",
+                    "ratingsCount": 101,
+                    "reviews": {
+                        "results": [
+                            {
+                                "hasAgreed": false,
+                                "isReportable": false,
+                                "memberId": "MrLefty0706",
+                                "overallRating": 2,
+                                "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=Z0NsCihsqnqih962N6vVnDDK8PXSYwLg%2fUwrxIi0ifUOsVNDgedx3g%3d%3d",
+                                "replies": [],
+                                "review": "Great customer service but gas prices are very high compared to the countrywide average.  Why?",
+                                "reviewDate": "2023-10-26T08:24:26.33Z",
+                                "reviewId": "10456320",
+                                "__typename": "Review"
+                            }
+                        ],
+                        "__typename": "ReviewResults"
+                    },
+                    "starRating": 3.7,
+                    "__typename": "Station"
+                },
+                {
+                    "address": {
+                        "country": "US",
+                        "line1": "19600 W Indian School Rd",
+                        "locality": "Buckeye",
+                        "postalCode": "85396",
+                        "region": "AZ",
+                        "__typename": "Address"
+                    },
+                    "amenities": [
+                        {
+                            "amenityId": "pay_at_pump",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/11.png",
+                            "name": "Pay At Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "membership_discount",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/21.png",
+                            "name": "Loyalty Discount",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "membership_required",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/22.png",
+                            "name": "Membership Required",
+                            "__typename": "Amenity"
+                        }
+                    ],
+                    "badges": [],
+                    "brands": [
+                        {
+                            "brandId": "213",
+                            "brandingType": "fuel",
+                            "imageUrl": "https://images.gasbuddy.io/b/213.png",
+                            "name": "Fry's",
+                            "__typename": "Brand"
+                        }
+                    ],
+                    "distance": "2.72mi",
+                    "emergencyStatus": null,
+                    "enterprise": false,
+                    "fuels": [
+                        "regular_gas",
+                        "midgrade_gas",
+                        "premium_gas",
+                        "diesel",
+                        "e85"
+                    ],
+                    "id": "203982",
+                    "latitude": 33.49422,
+                    "longitude": -112.481428,
+                    "name": "Fry's",
+                    "offers": [
+                        {
+                            "discounts": [
+                                {
+                                    "grades": [
+                                        "regular_gas"
+                                    ],
+                                    "highlight": "Deal Alert: Save 3¢ per gallon",
+                                    "pwgbDiscount": "0.03",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                },
+                                {
+                                    "grades": [
+                                        "midgrade_gas",
+                                        "premium_gas",
+                                        "diesel"
+                                    ],
+                                    "highlight": "Deal Alert: Save 4¢ per gallon",
+                                    "pwgbDiscount": "0.04",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                },
+                                {
+                                    "grades": [
+                                        "e85"
+                                    ],
+                                    "highlight": "Deal Alert: Save 2¢ per gallon",
+                                    "pwgbDiscount": "0.02",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                }
+                            ],
+                            "highlight": "Deal Alert: Save up to 4¢ per gallon",
+                            "id": "H5203982-3-4-4-4-2-Hao3s4LOMPilYbdNZvCUaJQ",
+                            "types": [
+                                "gasbuddy"
+                            ],
+                            "use": [
+                                "strike",
+                                "sort"
+                            ],
+                            "__typename": "Offer"
+                        }
+                    ],
+                    "payStatus": null,
+                    "prices": [
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-06T13:18:35.886Z",
+                                "price": 3.49,
+                                "formattedPrice": "$3.49",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "regular_gas",
+                            "longName": "Regular",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-06T13:18:35.902Z",
+                                "price": 3.84,
+                                "formattedPrice": "$3.84",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "midgrade_gas",
+                            "longName": "Midgrade",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-06T13:18:35.917Z",
+                                "price": 3.99,
+                                "formattedPrice": "$3.99",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "premium_gas",
+                            "longName": "Premium",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-06T13:18:35.933Z",
+                                "price": 3.89,
+                                "formattedPrice": "$3.89",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "diesel",
+                            "longName": "Diesel",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": null,
+                                "postedTime": null,
+                                "price": 0,
+                                "formattedPrice": "- - -",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "e85",
+                            "longName": "E85",
+                            "__typename": "PriceReport"
+                        }
+                    ],
+                    "priceUnit": "dollars_per_gallon",
+                    "ratingsCount": 74,
+                    "reviews": {
+                        "results": [
+                            {
+                                "hasAgreed": false,
+                                "isReportable": false,
+                                "memberId": "MrLefty0706",
+                                "overallRating": 3,
+                                "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=Z0NsCihsqnqih962N6vVnDDK8PXSYwLg%2fUwrxIi0ifUOsVNDgedx3g%3d%3d",
+                                "replies": [],
+                                "review": "Customer service is great.  Wish gas prices would come down faster.",
+                                "reviewDate": "2023-10-12T08:33:27.34Z",
+                                "reviewId": "10428055",
+                                "__typename": "Review"
+                            }
+                        ],
+                        "__typename": "ReviewResults"
+                    },
+                    "starRating": 4.9,
+                    "__typename": "Station"
+                },
+                {
+                    "address": {
+                        "country": "US",
+                        "line1": "537 S Watson Rd",
+                        "locality": "Buckeye",
+                        "postalCode": "85326-3442",
+                        "region": "AZ",
+                        "__typename": "Address"
+                    },
+                    "amenities": [
+                        {
+                            "amenityId": "c_store",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/9.png",
+                            "name": "C-Store",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "pay_at_pump",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/11.png",
+                            "name": "Pay At Pump",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "restaurant",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/12.png",
+                            "name": "Restaurant",
+                            "__typename": "Amenity"
+                        },
+                        {
+                            "amenityId": "restrooms",
+                            "imageUrl": "https://images.gasbuddy.com/di/features/v2/13.png",
+                            "name": "Restrooms",
+                            "__typename": "Amenity"
+                        }
+                    ],
+                    "badges": [],
+                    "brands": [
+                        {
+                            "brandId": "32",
+                            "brandingType": "cstore",
+                            "imageUrl": "https://images.gasbuddy.io/b/32.png",
+                            "name": "Circle K",
+                            "__typename": "Brand"
+                        }
+                    ],
+                    "distance": "3.28mi",
+                    "emergencyStatus": null,
+                    "enterprise": false,
+                    "fuels": [
+                        "regular_gas",
+                        "midgrade_gas",
+                        "premium_gas",
+                        "diesel"
+                    ],
+                    "id": "126744",
+                    "latitude": 33.44211461302,
+                    "longitude": -112.555931434035,
+                    "name": "Circle K",
+                    "offers": [
+                        {
+                            "discounts": [
+                                {
+                                    "grades": [
+                                        "regular_gas",
+                                        "diesel"
+                                    ],
+                                    "highlight": "Deal Alert: Save 3¢ per gallon",
+                                    "pwgbDiscount": "0.03",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                },
+                                {
+                                    "grades": [
+                                        "midgrade_gas",
+                                        "premium_gas"
+                                    ],
+                                    "highlight": "Deal Alert: Save 4¢ per gallon",
+                                    "pwgbDiscount": "0.04",
+                                    "receiptDiscount": null,
+                                    "__typename": "Discount"
+                                }
+                            ],
+                            "highlight": "Deal Alert: Save up to 4¢ per gallon",
+                            "id": "H5126744-3-4-4-3-H5R0MkFDoPz9n6rt2MnblKD",
+                            "types": [
+                                "gasbuddy"
+                            ],
+                            "use": [
+                                "strike",
+                                "sort"
+                            ],
+                            "__typename": "Offer"
+                        }
+                    ],
+                    "payStatus": null,
+                    "prices": [
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:40:26.368Z",
+                                "price": 3.39,
+                                "formattedPrice": "$3.39",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "regular_gas",
+                            "longName": "Regular",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:40:26.400Z",
+                                "price": 3.81,
+                                "formattedPrice": "$3.81",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "midgrade_gas",
+                            "longName": "Midgrade",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:40:26.446Z",
+                                "price": 4.09,
+                                "formattedPrice": "$4.09",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "premium_gas",
+                            "longName": "Premium",
+                            "__typename": "PriceReport"
+                        },
+                        {
+                            "cash": null,
+                            "credit": {
+                                "nickname": "Buddy_d8d8wbqg",
+                                "postedTime": "2023-12-07T14:40:26.487Z",
+                                "price": 3.69,
+                                "formattedPrice": "$3.69",
+                                "__typename": "FuelPrice"
+                            },
+                            "fuelProduct": "diesel",
+                            "longName": "Diesel",
+                            "__typename": "PriceReport"
+                        }
+                    ],
+                    "priceUnit": "dollars_per_gallon",
+                    "ratingsCount": 158,
+                    "reviews": {
+                        "results": [
+                            {
+                                "hasAgreed": false,
+                                "isReportable": false,
+                                "memberId": "dustinbirchard",
+                                "overallRating": 2,
+                                "profileImageUrl": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                                "replies": [],
+                                "review": "Great gas station just way too busy",
+                                "reviewDate": "2019-04-30T08:44:53.497Z",
+                                "reviewId": "5129312",
+                                "__typename": "Review"
+                            }
+                        ],
+                        "__typename": "ReviewResults"
+                    },
+                    "starRating": 4.2,
+                    "__typename": "Station"
+                }
+            ],
+            "offers": [
+                {
+                    "discounts": [
+                        {
+                            "grades": [
+                                "regular_gas",
+                                "premium_gas"
+                            ],
+                            "highlight": "Deal Alert: Save 3¢ per gallon",
+                            "pwgbDiscount": "0.03",
+                            "receiptDiscount": null,
+                            "__typename": "Discount"
+                        },
+                        {
+                            "grades": [
+                                "midgrade_gas"
+                            ],
+                            "highlight": "Deal Alert: Save 2¢ per gallon",
+                            "pwgbDiscount": "0.02",
+                            "receiptDiscount": null,
+                            "__typename": "Discount"
+                        }
+                    ],
+                    "highlight": "Deal Alert: Save up to 3¢ per gallon",
+                    "id": "H5208656-3-2-3-HfhcPy8dOCxPOWrBeElxRQy",
+                    "types": [
+                        "gasbuddy"
+                    ],
+                    "use": [
+                        "strike",
+                        "sort"
+                    ],
+                    "__typename": "Offer"
+                }
+            ],
+            "openStatus": "open",
+            "payStatus": {
+                "isPayAvailable": false,
+                "__typename": "PayStatus"
+            },
+            "phone": "",
+            "prices": [
+                {
+                    "cash": null,
+                    "credit": {
+                        "nickname": "Owner",
+                        "postedTime": "2023-12-07T17:21:38.370Z",
+                        "price": 2.99,
+                        "formattedPrice": "$2.99",
+                        "__typename": "FuelPrice"
+                    },
+                    "fuelProduct": "regular_gas",
+                    "longName": "Regular",
+                    "__typename": "PriceReport"
+                },
+                {
+                    "cash": null,
+                    "credit": {
+                        "nickname": "Owner",
+                        "postedTime": "2023-12-07T17:21:38.386Z",
+                        "price": 3.55,
+                        "formattedPrice": "$3.55",
+                        "__typename": "FuelPrice"
+                    },
+                    "fuelProduct": "premium_gas",
+                    "longName": "Premium",
+                    "__typename": "PriceReport"
+                }
+            ],
+            "priceUnit": "dollars_per_gallon",
+            "ratingsCount": 33,
+            "reviews": {
+                "count": 12,
+                "page": 1,
+                "results": [
+                    {
+                        "agreeTotal": 1,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "shannonc94",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=zjw05oMkI%2fjJuNxV5Hv2UWNkA%2f9b6zRAOSrP7YJIOII%2fdxpuGRXMgw%3d%3d",
+                        "replies": [],
+                        "review": "Multiple pumps which makes it easy to go in and get out",
+                        "reviewDate": "2023-10-01T01:08:13.423Z",
+                        "reviewId": "10406706",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 1,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "gasman50",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                        "replies": [],
+                        "review": "Best prices around!",
+                        "reviewDate": "2023-09-07T13:28:24.16Z",
+                        "reviewId": "10358189",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 1,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "Maxmaxspeed",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                        "replies": [],
+                        "review": "40 pumps. Makes this the largest station for Costco!\n",
+                        "reviewDate": "2023-08-06T06:55:45.333Z",
+                        "reviewId": "10289328",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 1,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "KVP34243",
+                        "overallRating": 2,
+                        "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=oFYWrcG4sS3aUnTX6mHgt4deKJvauIcYSbnd%2beYPF9YznzO2IxK%2bTA%3d%3d",
+                        "replies": [],
+                        "review": "Wrong address 1111\n NOT 1101",
+                        "reviewDate": "2023-08-01T21:13:48.907Z",
+                        "reviewId": "10275538",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 1,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "gppargolf",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                        "replies": [],
+                        "review": "Wow 5 pumps per line!! You will get in, refuel and get out quickly!! \nBut, they don’t have Diesel!!!",
+                        "reviewDate": "2023-07-25T16:12:48.187Z",
+                        "reviewId": "10259564",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 0,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "Titan106",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                        "replies": [],
+                        "review": "Best Costco gas I’ve ever been to. ",
+                        "reviewDate": "2023-12-06T15:46:43.013Z",
+                        "reviewId": "10538490",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 0,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "MrLefty0706",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=Z0NsCihsqnqih962N6vVnDDK8PXSYwLg%2fUwrxIi0ifUOsVNDgedx3g%3d%3d",
+                        "replies": [],
+                        "review": "Prices are very competitive and customer service is great.",
+                        "reviewDate": "2023-12-01T01:06:15.407Z",
+                        "reviewId": "10532022",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 0,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "streetdesign",
+                        "overallRating": 2,
+                        "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=kzs7%2fJKSA%2biXU2WuPb0ugOT8axK%2fgR3ISXqacGPbVeZe5enDERWyUw%3d%3d",
+                        "replies": [],
+                        "review": "Lowest gas prices in the area among top tier stations.",
+                        "reviewDate": "2023-11-30T13:24:24.75Z",
+                        "reviewId": "10527714",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 0,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "hlesser",
+                        "overallRating": 3,
+                        "profileImageUrl": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                        "replies": [],
+                        "review": "Just Top Tier gasoline at a bargain price ",
+                        "reviewDate": "2023-11-30T07:36:08.997Z",
+                        "reviewId": "10524957",
+                        "__typename": "Review"
+                    },
+                    {
+                        "agreeTotal": 0,
+                        "hasAgreed": false,
+                        "isReportable": false,
+                        "memberId": "itsa40",
+                        "overallRating": 1,
+                        "profileImageUrl": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=ZtG%2bK3DQa8Lp%2b2dFTVeilALPJ37am7LhQgZFq1B30Fo%3d",
+                        "replies": [],
+                        "review": "Wrong address....\nMust been entered in error. \nShould be deleted. ",
+                        "reviewDate": "2023-10-11T19:54:16.737Z",
+                        "reviewId": "10426325",
+                        "__typename": "Review"
+                    }
+                ],
+                "__typename": "ReviewResults"
+            },
+            "starRating": 4.5,
+            "topSpotters": [
+                {
+                    "avatar": "https://images.gasbuddy.com/FetchImage.ashx?key=qZBjP24FN9lKd%2bWwd7nTNw%3d%3d&id=Z0NsCihsqnqih962N6vVnDDK8PXSYwLg%2fUwrxIi0ifUOsVNDgedx3g%3d%3d",
+                    "count": 18,
+                    "name": "MrLefty0706",
+                    "streak": 95,
+                    "__typename": "TopSpotter"
+                },
+                {
+                    "avatar": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                    "count": 9,
+                    "name": "Buddy_d8d8wbqg",
+                    "streak": 0,
+                    "__typename": "TopSpotter"
+                },
+                {
+                    "avatar": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                    "count": 6,
+                    "name": "Buddy_pru2ccv4",
+                    "streak": 0,
+                    "__typename": "TopSpotter"
+                },
+                {
+                    "avatar": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                    "count": 4,
+                    "name": "gppargolf",
+                    "streak": 0,
+                    "__typename": "TopSpotter"
+                },
+                {
+                    "avatar": "https://images.gasbuddy.com/images/websites/gasbuddy/default-avatar.jpg",
+                    "count": 4,
+                    "name": "Titan106",
+                    "streak": 0,
+                    "__typename": "TopSpotter"
+                }
+            ],
+            "__typename": "Station"
+        }
+    }
+}
