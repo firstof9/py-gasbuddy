@@ -99,12 +99,18 @@ class GasBuddy:
         response = await self.process_request(query)
 
         if "error" in response.keys():
-            _LOGGER.error("An error occured attempting to retrieve the data: %s", response["error"])
+            _LOGGER.error(
+                "An error occured attempting to retrieve the data: %s",
+                response["error"],
+            )
             raise LibraryError
         elif "errors" in response.keys():
-            _LOGGER.error("An error occured attempting to retrieve the data: %s", response["errors"]["message"])
+            _LOGGER.error(
+                "An error occured attempting to retrieve the data: %s",
+                response["errors"]["message"],
+            )
             raise APIError
-        
+
         data = {}
 
         data["station_id"] = response["data"]["station"]["id"]
@@ -114,6 +120,10 @@ class GasBuddy:
         prices = response["data"]["station"]["prices"]
         for price in prices:
             index = price["fuelProduct"]
-            data[index] = {"credit": price["credit"]["nickname"], "price": price["credit"]["price"], "last_updated": price["credit"]["postedTime"]}
+            data[index] = {
+                "credit": price["credit"]["nickname"],
+                "price": price["credit"]["price"],
+                "last_updated": price["credit"]["postedTime"],
+            }
 
         return data
