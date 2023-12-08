@@ -8,6 +8,7 @@ from typing import Any, Collection
 import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 
+from .exceptions import APIError, LibraryError, MissingSearchData
 from .consts import BASE_URL, DEFAULT_HEADERS, GAS_PRICE_QUERY, LOCATION_QUERY
 
 ERROR_TIMEOUT = "Timeout while updating"
@@ -54,10 +55,10 @@ class GasBuddy:
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
-                message = {"msg": ERROR_TIMEOUT}
+                message = {"error": ERROR_TIMEOUT}
             except ContentTypeError as err:
                 _LOGGER.error("%s", err)
-                message = {"msg": err}
+                message = {"error": err}
 
             await session.close()
             return message
@@ -94,8 +95,25 @@ class GasBuddy:
             "variables": {"id": str(self._id)},
         }
 
-        return await self.process_request(query)
+        # Parse and format data into easy to use dict
+        response = await self.process_request(query)
 
+        if "error" in response.keys():
+            _LOGGER.error("An error occured attempting to retrieve the data: %s", response["error"])
+            raise LibraryError
+        elif "errors" in response.keys():
+            _LOGGER.error("An error occured attempting to retrieve the data: %s", response["errors"]["message"])
+            raise APIError
+        
+        data = {}
 
-class MissingSearchData(Exception):
-    """Exception for missing search data variable."""
+        data["station_id"] = response["data"]["station"]["id"]
+        data["unit_of_measure"] = response["data"]["station"]["priceUnit"]
+        data["currency"] = response["data"]["station"]["currency"]
+
+        prices = response["data"]["station"]["prices"]
+        for price in prices:
+            index = price["fuelProduct"]
+            data[index] = {"credit": price["credit"]["nickname"], "price": price["credit"]["price"], "last_updated": price["credit"]["postedTime"]}
+
+        return data
