@@ -28,6 +28,7 @@ class GasBuddy:
     ) -> dict[str, Any]:
         """Process API requests."""
         async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
+            _LOGGER.debug("URL: %s\nQuery: %s", self._url, query)
             try:
                 async with session.post(self._url, data=query) as response:
                     message: dict[str, Any] | Any = {}
