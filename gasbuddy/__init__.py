@@ -25,7 +25,7 @@ class GasBuddy:
 
     async def process_request(
         self, query: dict[str, Collection[str]]
-    ) -> dict[str, str] | dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process API requests."""
         async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
             try:
@@ -87,7 +87,7 @@ class GasBuddy:
 
         return await self.process_request(query)
 
-    async def price_lookup(self) -> dict[str, str] | dict[str, Any]:
+    async def price_lookup(self) -> dict[str, Any] | None:
         """Return gas price of station_id."""
         query = {
             "operationName": "GetStation",
@@ -99,15 +99,17 @@ class GasBuddy:
         response = await self.process_request(query)
 
         if "error" in response.keys():
+            message = response["error"]
             _LOGGER.error(
                 "An error occured attempting to retrieve the data: %s",
-                response["error"],
+                message,
             )
             raise LibraryError
-        elif "errors" in response.keys():
+        if "errors" in response.keys():
+            message = response["errors"]["message"]
             _LOGGER.error(
                 "An error occured attempting to retrieve the data: %s",
-                response["errors"]["message"],
+                message,
             )
             raise APIError
 
