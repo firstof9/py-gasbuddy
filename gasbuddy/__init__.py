@@ -100,6 +100,8 @@ class GasBuddy:
         # Parse and format data into easy to use dict
         response = await self.process_request(query)
 
+        _LOGGER.debug("price_lookup response: %s", response)
+
         if "error" in response.keys():
             message = response["error"]
             _LOGGER.error(
@@ -121,6 +123,8 @@ class GasBuddy:
         data["unit_of_measure"] = response["data"]["station"]["priceUnit"]
         data["currency"] = response["data"]["station"]["currency"]
 
+        _LOGGER.debug("pre-price data: %s", data)
+
         prices = response["data"]["station"]["prices"]
         for price in prices:
             index = price["fuelProduct"]
@@ -129,5 +133,7 @@ class GasBuddy:
                 "price": price["credit"]["price"],
                 "last_updated": price["credit"]["postedTime"],
             }
+
+        _LOGGER.debug("final data: %s", data)
 
         return data

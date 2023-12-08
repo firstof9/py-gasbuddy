@@ -62,3 +62,17 @@ async def test_price_lookup(mock_aioclient):
     assert data["regular_gas"]["last_updated"] == "2023-12-07T17:21:38.370Z"
     assert data["unit_of_measure"] == "dollars_per_gallon"
     assert data["currency"] == "USD"
+
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("station2.json"),
+    )
+    data = await gasbuddy.GasBuddy(station_id=208656).price_lookup()
+
+    assert data["station_id"] == "197274"
+    assert data["regular_gas"]["price"] == 109.9
+    assert data["regular_gas"]["credit"] == "dsteinke222"
+    assert data["regular_gas"]["last_updated"] == "2023-12-08T19:43:11.167Z"
+    assert data["unit_of_measure"] == "cents_per_liter"
+    assert data["currency"] == "CAD"

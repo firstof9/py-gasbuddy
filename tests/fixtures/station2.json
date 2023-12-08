@@ -1,0 +1,29 @@
+{
+    "data": {
+        "station": {
+            "prices": [
+                {
+                    "credit": {
+                        "nickname": "dsteinke222",
+                        "postedTime": "2023-12-08T19:43:11.167Z",
+                        "price": 109.9
+                    },
+                    "fuelProduct": "regular_gas",
+                    "longName": "Regular"
+                },
+                {
+                    "credit": {
+                        "nickname": "dsteinke222",
+                        "postedTime": "2023-12-08T19:43:11.183Z",
+                        "price": 124.9
+                    },
+                    "fuelProduct": "premium_gas",
+                    "longName": "Premium"
+                }
+            ],
+            "priceUnit": "cents_per_liter",
+            "currency": "CAD",
+            "id": "197274"
+        }
+    }
+}
