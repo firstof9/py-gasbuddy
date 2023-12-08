@@ -6,5 +6,5 @@ DEFAULT_HEADERS = {
     "Content-Type": "application/json",
 }
 # pylint: disable-next=line-too-long
-GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { prices { credit { nickname postedTime price } fuelProduct longName } priceUnit currency } }"  # pylint: disable-next=line-too-long
+GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { prices { credit { nickname postedTime price } fuelProduct longName } priceUnit currency id } }"  # pylint: disable-next=line-too-long
 LOCATION_QUERY = "query LocationBySearchTerm($brandId: Int, $cursor: String, $fuel: Int, $lat: Float, $lng: Float, $maxAge: Int, $search: String) { locationBySearchTerm(lat: $lat, lng: $lng, search: $search) { stations(brandId: $brandId cursor: $cursor fuel: $fuel lat: $lat lng: $lng maxAge: $maxAge) { count results { address { line1 } id name } } } }"
