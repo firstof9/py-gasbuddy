@@ -56,5 +56,9 @@ async def test_price_lookup(mock_aioclient):
     )
     data = await gasbuddy.GasBuddy(station_id=208656).price_lookup()
 
-    assert data["data"]["station"]["id"] == "208656"
-    assert data["data"]["station"]["prices"][0]["credit"]["price"] == 2.99
+    assert data["station_id"] == "208656"
+    assert data["regular_gas"]["price"] == 2.99
+    assert data["regular_gas"]["credit"] == "Owner"
+    assert data["regular_gas"]["last_updated"] == "2023-12-07T17:21:38.370Z"
+    assert data["unit_of_measure"] == "dollars_per_gallon"
+    assert data["currency"] == "USD"

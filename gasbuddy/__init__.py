@@ -8,6 +8,7 @@ from typing import Any, Collection
 import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 
+from .exceptions import APIError, LibraryError, MissingSearchData
 from .consts import BASE_URL, DEFAULT_HEADERS, GAS_PRICE_QUERY, LOCATION_QUERY
 
 ERROR_TIMEOUT = "Timeout while updating"
@@ -24,7 +25,7 @@ class GasBuddy:
 
     async def process_request(
         self, query: dict[str, Collection[str]]
-    ) -> dict[str, str] | dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process API requests."""
         async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
             try:
@@ -54,10 +55,10 @@ class GasBuddy:
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
-                message = {"msg": ERROR_TIMEOUT}
+                message = {"error": ERROR_TIMEOUT}
             except ContentTypeError as err:
                 _LOGGER.error("%s", err)
-                message = {"msg": err}
+                message = {"error": err}
 
             await session.close()
             return message
@@ -86,7 +87,7 @@ class GasBuddy:
 
         return await self.process_request(query)
 
-    async def price_lookup(self) -> dict[str, str] | dict[str, Any]:
+    async def price_lookup(self) -> dict[str, Any] | None:
         """Return gas price of station_id."""
         query = {
             "operationName": "GetStation",
@@ -94,8 +95,37 @@ class GasBuddy:
             "variables": {"id": str(self._id)},
         }
 
-        return await self.process_request(query)
+        # Parse and format data into easy to use dict
+        response = await self.process_request(query)
 
+        if "error" in response.keys():
+            message = response["error"]
+            _LOGGER.error(
+                "An error occured attempting to retrieve the data: %s",
+                message,
+            )
+            raise LibraryError
+        if "errors" in response.keys():
+            message = response["errors"]["message"]
+            _LOGGER.error(
+                "An error occured attempting to retrieve the data: %s",
+                message,
+            )
+            raise APIError
 
-class MissingSearchData(Exception):
-    """Exception for missing search data variable."""
+        data = {}
+
+        data["station_id"] = response["data"]["station"]["id"]
+        data["unit_of_measure"] = response["data"]["station"]["priceUnit"]
+        data["currency"] = response["data"]["station"]["currency"]
+
+        prices = response["data"]["station"]["prices"]
+        for price in prices:
+            index = price["fuelProduct"]
+            data[index] = {
+                "credit": price["credit"]["nickname"],
+                "price": price["credit"]["price"],
+                "last_updated": price["credit"]["postedTime"],
+            }
+
+        return data
