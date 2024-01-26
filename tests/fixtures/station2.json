@@ -23,7 +23,9 @@
             ],
             "priceUnit": "cents_per_liter",
             "currency": "CAD",
-            "id": "197274"
+            "id": "197274",
+            "latitude": 33.459108,
+            "longitude": -112.502745            
         }
     }
 }
