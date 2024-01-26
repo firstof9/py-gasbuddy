@@ -123,6 +123,8 @@ class GasBuddy:
         data["station_id"] = response["data"]["station"]["id"]
         data["unit_of_measure"] = response["data"]["station"]["priceUnit"]
         data["currency"] = response["data"]["station"]["currency"]
+        data["latitude"] = response["data"]["station"]["latitude"]
+        data["longitude"] = response["data"]["station"]["longitude"]
 
         _LOGGER.debug("pre-price data: %s", data)
 

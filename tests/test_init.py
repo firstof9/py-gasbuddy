@@ -76,3 +76,5 @@ async def test_price_lookup(mock_aioclient):
     assert data["regular_gas"]["last_updated"] == "2023-12-08T19:43:11.167Z"
     assert data["unit_of_measure"] == "cents_per_liter"
     assert data["currency"] == "CAD"
+    assert data["latitude"] == 33.459108
+    assert data["longitude"] == -112.502745
