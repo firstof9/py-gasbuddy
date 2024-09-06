@@ -54,12 +54,13 @@ async def test_price_lookup(mock_aioclient):
         status=200,
         body=load_fixture("station.json"),
     )
-    data = await gasbuddy.GasBuddy(station_id=208656).price_lookup()
+    data = await gasbuddy.GasBuddy(station_id=205033).price_lookup()
 
-    assert data["station_id"] == "208656"
-    assert data["regular_gas"]["price"] == 2.99
-    assert data["regular_gas"]["credit"] == "Owner"
-    assert data["regular_gas"]["last_updated"] == "2023-12-07T17:21:38.370Z"
+    assert data["station_id"] == "205033"
+    assert data["regular_gas"]["price"] == 3.27
+    assert data["regular_gas"]["cash_price"] == 3.17
+    assert data["regular_gas"]["credit"] == "Flemmit"
+    assert data["regular_gas"]["last_updated"] == "2024-09-06T09:54:05.489Z"
     assert data["unit_of_measure"] == "dollars_per_gallon"
     assert data["currency"] == "USD"
 
@@ -68,13 +69,14 @@ async def test_price_lookup(mock_aioclient):
         status=200,
         body=load_fixture("station2.json"),
     )
-    data = await gasbuddy.GasBuddy(station_id=208656).price_lookup()
+    data = await gasbuddy.GasBuddy(station_id=197274).price_lookup()
 
     assert data["station_id"] == "197274"
-    assert data["regular_gas"]["price"] == 109.9
-    assert data["regular_gas"]["credit"] == "dsteinke222"
-    assert data["regular_gas"]["last_updated"] == "2023-12-08T19:43:11.167Z"
+    assert data["regular_gas"]["price"] == 131.9
+    assert not "cash_price" in data["regular_gas"]
+    assert data["regular_gas"]["credit"] == "qjnw4hgzcn"
+    assert data["regular_gas"]["last_updated"] == "2024-09-06T14:42:39.298Z"
     assert data["unit_of_measure"] == "cents_per_liter"
     assert data["currency"] == "CAD"
-    assert data["latitude"] == 33.459108
-    assert data["longitude"] == -112.502745
+    assert data["latitude"] == 53.3066
+    assert data["longitude"] == -113.5559

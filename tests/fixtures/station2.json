@@ -3,19 +3,21 @@
         "station": {
             "prices": [
                 {
+                    "cash": null,
                     "credit": {
-                        "nickname": "dsteinke222",
-                        "postedTime": "2023-12-08T19:43:11.167Z",
-                        "price": 109.9
+                        "nickname": "qjnw4hgzcn",
+                        "postedTime": "2024-09-06T14:42:39.298Z",
+                        "price": 131.9
                     },
                     "fuelProduct": "regular_gas",
                     "longName": "Regular"
                 },
                 {
+                    "cash": null,
                     "credit": {
-                        "nickname": "dsteinke222",
-                        "postedTime": "2023-12-08T19:43:11.183Z",
-                        "price": 124.9
+                        "nickname": "arcticwolf",
+                        "postedTime": "2024-09-06T12:57:23.068Z",
+                        "price": 149.9
                     },
                     "fuelProduct": "premium_gas",
                     "longName": "Premium"
@@ -24,8 +26,8 @@
             "priceUnit": "cents_per_liter",
             "currency": "CAD",
             "id": "197274",
-            "latitude": 33.459108,
-            "longitude": -112.502745            
+            "latitude": 53.3066,
+            "longitude": -113.5559
         }
     }
 }
