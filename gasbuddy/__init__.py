@@ -137,7 +137,7 @@ class GasBuddy:
                     "cash_price": price["cash"]["price"],
                     "price": price["credit"]["price"],
                     "last_updated": price["credit"]["postedTime"],
-                }                
+                }
             else:
                 data[index] = {
                     "credit": price["credit"]["nickname"],
