@@ -131,11 +131,19 @@ class GasBuddy:
         prices = response["data"]["station"]["prices"]
         for price in prices:
             index = price["fuelProduct"]
-            data[index] = {
-                "credit": price["credit"]["nickname"],
-                "price": price["credit"]["price"],
-                "last_updated": price["credit"]["postedTime"],
-            }
+            if price["cash"]:
+                data[index] = {
+                    "credit": price["credit"]["nickname"],
+                    "cash_price": price["cash"]["price"],
+                    "price": price["credit"]["price"],
+                    "last_updated": price["credit"]["postedTime"],
+                }                
+            else:
+                data[index] = {
+                    "credit": price["credit"]["nickname"],
+                    "price": price["credit"]["price"],
+                    "last_updated": price["credit"]["postedTime"],
+                }
 
         _LOGGER.debug("final data: %s", data)
 
