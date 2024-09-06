@@ -42,7 +42,7 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-    needs: build
+    needs: tests
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3.3.0
