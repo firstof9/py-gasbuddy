@@ -63,6 +63,7 @@ async def test_price_lookup(mock_aioclient):
     assert data["regular_gas"]["last_updated"] == "2024-09-06T09:54:05.489Z"
     assert data["unit_of_measure"] == "dollars_per_gallon"
     assert data["currency"] == "USD"
+    assert not data["image_url"]
 
     mock_aioclient.post(
         TEST_URL,
@@ -80,3 +81,4 @@ async def test_price_lookup(mock_aioclient):
     assert data["currency"] == "CAD"
     assert data["latitude"] == 53.3066
     assert data["longitude"] == -113.5559
+    assert data["image_url"] == "https://images.gasbuddy.io/b/117.png"

@@ -1,6 +1,14 @@
 {
     "data": {
         "station": {
+            "brands": [
+                {
+                    "imageUrl": "https://images.gasbuddy.io/b/117.png"
+                },
+                {
+                    "imageUrl": "https://images.gasbuddy.io/b/117.png"
+                }
+            ],            
             "prices": [
                 {
                     "cash": null,

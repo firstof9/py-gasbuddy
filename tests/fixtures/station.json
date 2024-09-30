@@ -1,6 +1,7 @@
 {
     "data": {
         "station": {
+            "brands": [],                
             "prices": [
                 {
                     "cash": {
