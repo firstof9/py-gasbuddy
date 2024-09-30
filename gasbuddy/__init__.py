@@ -125,6 +125,10 @@ class GasBuddy:
         data["currency"] = response["data"]["station"]["currency"]
         data["latitude"] = response["data"]["station"]["latitude"]
         data["longitude"] = response["data"]["station"]["longitude"]
+        data["image_url"] = None
+
+        if len(response["data"]["station"]["brands"]) > 0:
+            data["image_url"] = response["data"]["station"]["brands"][0]["imageUrl"]
 
         _LOGGER.debug("pre-price data: %s", data)
 
