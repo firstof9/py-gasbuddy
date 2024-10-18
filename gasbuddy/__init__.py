@@ -139,13 +139,21 @@ class GasBuddy:
                 data[index] = {
                     "credit": price["credit"]["nickname"],
                     "cash_price": price["cash"]["price"],
-                    "price": price["credit"]["price"],
+                    "price": (
+                        None
+                        if price.get("credit", {}).get("price", 0) == 0
+                        else price["credit"]["price"]
+                    ),
                     "last_updated": price["credit"]["postedTime"],
                 }
             else:
                 data[index] = {
                     "credit": price["credit"]["nickname"],
-                    "price": price["credit"]["price"],
+                    "price": (
+                        None
+                        if price.get("credit", {}).get("price", 0) == 0
+                        else price["credit"]["price"]
+                    ),
                     "last_updated": price["credit"]["postedTime"],
                 }
 
