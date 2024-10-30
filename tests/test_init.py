@@ -65,6 +65,7 @@ async def test_price_lookup(mock_aioclient):
     assert data["currency"] == "USD"
     assert not data["image_url"]
     assert not data["premium_gas"]["price"]
+    assert not data["premium_gas"]["cash_price"]
 
     mock_aioclient.post(
         TEST_URL,

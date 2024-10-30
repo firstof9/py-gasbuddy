@@ -138,7 +138,11 @@ class GasBuddy:
             if price["cash"]:
                 data[index] = {
                     "credit": price["credit"]["nickname"],
-                    "cash_price": price["cash"]["price"],
+                    "cash_price": (
+                        None
+                        if price.get("cash", {}).get("price", 0) == 0
+                        else price["cash"]["price"]
+                    ),
                     "price": (
                         None
                         if price.get("credit", {}).get("price", 0) == 0
