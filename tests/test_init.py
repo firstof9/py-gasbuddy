@@ -1,9 +1,12 @@
 """Library tests."""
 
-from aiohttp.client_exceptions import ServerTimeoutError
-import gasbuddy
+import json
 import logging
+
 import pytest
+from aiohttp.client_exceptions import ServerTimeoutError
+
+import gasbuddy
 from tests.common import load_fixture
 
 pytestmark = pytest.mark.asyncio
@@ -123,3 +126,19 @@ async def test_price_lookup_gps(mock_aioclient):
             "last_updated": "2024-11-18T21:58:38.946Z",
         },
     }
+
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body="[...]",
+    )
+    with pytest.raises(gasbuddy.exceptions.LibraryError):
+        data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)
+
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=json.dumps({"errors":{"message": "Fake Error"}}),
+    )
+    with pytest.raises(gasbuddy.exceptions.APIError):
+        data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)    
