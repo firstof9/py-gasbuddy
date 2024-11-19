@@ -84,3 +84,42 @@ async def test_price_lookup(mock_aioclient):
     assert data["latitude"] == 53.3066
     assert data["longitude"] == -113.5559
     assert data["image_url"] == "https://images.gasbuddy.io/b/117.png"
+
+
+async def test_price_lookup_gps(mock_aioclient):
+    """Test price_lookup function."""
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("prices_gps.json"),
+    )
+    data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)
+
+    assert isinstance(data, dict)
+    assert data["results"][0] == {
+        "station_id": "187725",
+        "unit_of_measure": "dollars_per_gallon",
+        "currency": "USD",
+        "latitude": 33.465405037595,
+        "longitude": -112.505053281784,
+        "regular_gas": {
+            "credit": "fred1129",
+            "price": 3.28,
+            "last_updated": "2024-11-18T21:58:38.859Z",
+        },
+        "midgrade_gas": {
+            "credit": "fred1129",
+            "price": 3.73,
+            "last_updated": "2024-11-18T21:58:38.891Z",
+        },
+        "premium_gas": {
+            "credit": "fred1129",
+            "price": 4,
+            "last_updated": "2024-11-18T21:58:38.915Z",
+        },
+        "diesel": {
+            "credit": "fred1129",
+            "price": 3.5,
+            "last_updated": "2024-11-18T21:58:38.946Z",
+        },
+    }
