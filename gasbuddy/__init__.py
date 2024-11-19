@@ -9,8 +9,14 @@ from typing import Any, Collection
 import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 
+from .consts import (
+    BASE_URL,
+    DEFAULT_HEADERS,
+    GAS_PRICE_QUERY,
+    LOCATION_QUERY,
+    LOCATION_QUERY_PRICES,
+)
 from .exceptions import APIError, LibraryError, MissingSearchData
-from .consts import BASE_URL, DEFAULT_HEADERS, GAS_PRICE_QUERY, LOCATION_QUERY
 
 ERROR_TIMEOUT = "Timeout while updating"
 _LOGGER = logging.getLogger(__name__)
@@ -164,3 +170,79 @@ class GasBuddy:
         _LOGGER.debug("final data: %s", data)
 
         return data
+
+    async def price_lookup_gps(
+        self,
+        lat: float,
+        lon: float,
+    ) -> dict[str, Any] | None:
+        """Return gas price of station_id."""
+        variables = {"maxAge": 0, "lat": lat, "lng": lon}
+        query = {
+            "operationName": "LocationBySearchTerm",
+            "query": LOCATION_QUERY_PRICES,
+            "variables": variables,
+        }
+
+        # Parse and format data into easy to use dict
+        response = await self.process_request(query)
+
+        _LOGGER.debug("price_lookup_gps response: %s", response)
+
+        if "error" in response.keys():
+            message = response["error"]
+            _LOGGER.error(
+                "An error occured attempting to retrieve the data: %s",
+                message,
+            )
+            raise LibraryError
+        if "errors" in response.keys():
+            message = response["errors"]["message"]
+            _LOGGER.error(
+                "An error occured attempting to retrieve the data: %s",
+                message,
+            )
+            raise APIError
+
+        result_list = []
+        for result in response["data"]["locationBySearchTerm"]["stations"]["results"]:
+            # parse the prices
+            price_data = {}
+            price_data["station_id"] = result["id"]
+            price_data["unit_of_measure"] = result["priceUnit"]
+            price_data["currency"] = result["currency"]
+            price_data["latitude"] = result["latitude"]
+            price_data["longitude"] = result["longitude"]
+
+            for price in result["prices"]:
+                index = price["fuelProduct"]
+                if price["cash"]:
+                    price_data[index] = {
+                        "credit": price["credit"]["nickname"],
+                        "cash_price": (
+                            None
+                            if price.get("cash", {}).get("price", 0) == 0
+                            else price["cash"]["price"]
+                        ),
+                        "price": (
+                            None
+                            if price.get("credit", {}).get("price", 0) == 0
+                            else price["credit"]["price"]
+                        ),
+                        "last_updated": price["credit"]["postedTime"],
+                    }
+                else:
+                    price_data[index] = {
+                        "credit": price["credit"]["nickname"],
+                        "price": (
+                            None
+                            if price.get("credit", {}).get("price", 0) == 0
+                            else price["credit"]["price"]
+                        ),
+                        "last_updated": price["credit"]["postedTime"],
+                    }
+            result_list.append(price_data)
+        _LOGGER.debug("final data: %s", result_list)
+        value = {}
+        value["results"] = result_list
+        return value
