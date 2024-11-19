@@ -138,7 +138,7 @@ async def test_price_lookup_gps(mock_aioclient):
     mock_aioclient.post(
         TEST_URL,
         status=200,
-        body=json.dumps({"errors":{"message": "Fake Error"}}),
+        body=json.dumps({"errors": {"message": "Fake Error"}}),
     )
     with pytest.raises(gasbuddy.exceptions.APIError):
-        data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)    
+        data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)

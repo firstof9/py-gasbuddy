@@ -9,8 +9,13 @@ from typing import Any, Collection
 import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 
-from .consts import (BASE_URL, DEFAULT_HEADERS, GAS_PRICE_QUERY,
-                     LOCATION_QUERY, LOCATION_QUERY_PRICES)
+from .consts import (
+    BASE_URL,
+    DEFAULT_HEADERS,
+    GAS_PRICE_QUERY,
+    LOCATION_QUERY,
+    LOCATION_QUERY_PRICES,
+)
 from .exceptions import APIError, LibraryError, MissingSearchData
 
 ERROR_TIMEOUT = "Timeout while updating"
