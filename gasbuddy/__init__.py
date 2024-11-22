@@ -175,6 +175,7 @@ class GasBuddy:
         self,
         lat: float,
         lon: float,
+        limit: int = 5,
     ) -> dict[str, Any] | None:
         """Return gas price of station_id."""
         variables = {"maxAge": 0, "lat": lat, "lng": lon}
@@ -206,6 +207,9 @@ class GasBuddy:
 
         result_list = []
         for result in response["data"]["locationBySearchTerm"]["stations"]["results"]:
+            if limit <= 0:
+                break
+            limit -= 1
             # parse the prices
             price_data = {}
             price_data["station_id"] = result["id"]

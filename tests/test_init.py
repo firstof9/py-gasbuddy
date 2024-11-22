@@ -126,6 +126,7 @@ async def test_price_lookup_gps(mock_aioclient):
             "last_updated": "2024-11-18T21:58:38.946Z",
         },
     }
+    assert len(data["results"]) == 5
 
     mock_aioclient.post(
         TEST_URL,
