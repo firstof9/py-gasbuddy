@@ -5,6 +5,14 @@ BASE_URL = "https://www.gasbuddy.com/graphql"
 
 DEFAULT_HEADERS = {
     "Content-Type": "application/json",
+    "Sec-Fetch-Dest": "",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Priority": "u=0",
+    "apollo-require-preflight": "true",
+    "gbcsrf": "1.i+hEh7FkvCjr/eBk",
+    "Origin": "https://www.gasbuddy.com",
+    "Referer": "https://www.gasbuddy.com/home",
 }
 # pylint: disable-next=line-too-long
 GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { brands { imageUrl } prices { cash { nickname postedTime price } credit { nickname postedTime price } fuelProduct longName } priceUnit currency id latitude longitude } }"  # pylint: disable-next=line-too-long
