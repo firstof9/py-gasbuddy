@@ -225,10 +225,9 @@ class GasBuddy:
         trend_data: dict[str, Any] = {}
         if response["data"]["locationBySearchTerm"]["trends"][0]:
             result = response["data"]["locationBySearchTerm"]["trends"][0]
-            trend_data["trend"] = {}
-            trend_data["trend"]["average_price"] = result["today"]
-            trend_data["trend"]["lowest_price"] = result["todayLow"]
-            trend_data["trend"]["area"] = result["areaName"]
+            trend_data["average_price"] = result["today"]
+            trend_data["lowest_price"] = result["todayLow"]
+            trend_data["area"] = result["areaName"]
         return trend_data
 
     async def _parse_results(self, response: dict, limit: int) -> list:
