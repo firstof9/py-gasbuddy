@@ -128,7 +128,9 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         },
     }
     assert len(data["results"]) == 5
-    assert data["trend"] == {'trend': {'average_price': 3.33, 'lowest_price': 2.59, 'area': 'Arizona'}}
+    assert data["trend"] == {
+        "trend": {"average_price": 3.33, "lowest_price": 2.59, "area": "Arizona"}
+    }
     assert len(data["trend"]) == 1
 
     mock_aioclient.post(

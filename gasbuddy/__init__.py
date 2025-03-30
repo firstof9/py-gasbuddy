@@ -210,6 +210,29 @@ class GasBuddy:
             )
             raise APIError
 
+        result_list = await self._parse_results(response, limit)
+        _LOGGER.debug("result data: %s", result_list)
+        value: dict[Any, Any] = {}
+        value["results"] = result_list
+        trend_data = await self._parse_trends(response)
+        if trend_data:
+            value["trend"] = trend_data
+            _LOGGER.debug("trend data: %s", trend_data)
+        return value
+
+    async def _parse_trends(self, response: dict) -> dict | None:
+        """Parse API results and return trend dict."""
+        trend_data: dict[str, Any] = {}
+        if response["data"]["locationBySearchTerm"]["trends"][0]:
+            result = response["data"]["locationBySearchTerm"]["trends"][0]
+            trend_data["trend"] = {}
+            trend_data["trend"]["average_price"] = result["today"]
+            trend_data["trend"]["lowest_price"] = result["todayLow"]
+            trend_data["trend"]["area"] = result["areaName"]
+        return trend_data
+
+    async def _parse_results(self, response: dict, limit: int) -> list:
+        """Parse API results and return price data list."""
         result_list = []
         for result in response["data"]["locationBySearchTerm"]["stations"]["results"]:
             if limit <= 0:
@@ -251,18 +274,4 @@ class GasBuddy:
                         "last_updated": price["credit"]["postedTime"],
                     }
             result_list.append(price_data)
-        if response["data"]["locationBySearchTerm"]["trends"][0]:
-            result = response["data"]["locationBySearchTerm"]["trends"][0]
-            trend_data = {}
-            trend_data["trend"] = {}
-            trend_data["trend"]["average_price"] = result["today"]
-            trend_data["trend"]["lowest_price"] = result["todayLow"]
-            trend_data["trend"]["area"] = result["areaName"]
-
-        _LOGGER.debug("result data: %s", result_list)
-        value = {}
-        value["results"] = result_list
-        if trend_data:
-            value["trend"] = trend_data
-            _LOGGER.debug("trend data: %s", trend_data)
-        return value
+        return result_list
