@@ -89,14 +89,15 @@ async def test_price_lookup(mock_aioclient):
     assert data["image_url"] == "https://images.gasbuddy.io/b/117.png"
 
 
-async def test_price_lookup_gps(mock_aioclient):
+async def test_price_lookup_service(mock_aioclient, caplog):
     """Test price_lookup function."""
     mock_aioclient.post(
         TEST_URL,
         status=200,
         body=load_fixture("prices_gps.json"),
     )
-    data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)
+    with caplog.at_level(logging.DEBUG):
+        data = await gasbuddy.GasBuddy().price_lookup_service(lat=1234, lon=5678)
 
     assert isinstance(data, dict)
     assert data["results"][0] == {
@@ -127,6 +128,52 @@ async def test_price_lookup_gps(mock_aioclient):
         },
     }
     assert len(data["results"]) == 5
+    assert data["trend"] == {
+        "trend": {"average_price": 3.33, "lowest_price": 2.59, "area": "Arizona"}
+    }
+    assert len(data["trend"]) == 1
+
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("prices_gps.json"),
+    )
+    with caplog.at_level(logging.DEBUG):
+        data = await gasbuddy.GasBuddy().price_lookup_service(zipcode=12345)
+
+    assert isinstance(data, dict)
+    assert data["results"][0] == {
+        "station_id": "187725",
+        "unit_of_measure": "dollars_per_gallon",
+        "currency": "USD",
+        "latitude": 33.465405037595,
+        "longitude": -112.505053281784,
+        "regular_gas": {
+            "credit": "fred1129",
+            "price": 3.28,
+            "last_updated": "2024-11-18T21:58:38.859Z",
+        },
+        "midgrade_gas": {
+            "credit": "fred1129",
+            "price": 3.73,
+            "last_updated": "2024-11-18T21:58:38.891Z",
+        },
+        "premium_gas": {
+            "credit": "fred1129",
+            "price": 4,
+            "last_updated": "2024-11-18T21:58:38.915Z",
+        },
+        "diesel": {
+            "credit": "fred1129",
+            "price": 3.5,
+            "last_updated": "2024-11-18T21:58:38.946Z",
+        },
+    }
+    assert len(data["results"]) == 5
+    assert data["trend"] == {
+        "trend": {"average_price": 3.33, "lowest_price": 2.59, "area": "Arizona"}
+    }
+    assert len(data["trend"]) == 1    
 
     mock_aioclient.post(
         TEST_URL,
@@ -134,7 +181,7 @@ async def test_price_lookup_gps(mock_aioclient):
         body="[...]",
     )
     with pytest.raises(gasbuddy.exceptions.LibraryError):
-        data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)
+        data = await gasbuddy.GasBuddy().price_lookup_service(lat=1234, lon=5678)
 
     mock_aioclient.post(
         TEST_URL,
@@ -142,4 +189,4 @@ async def test_price_lookup_gps(mock_aioclient):
         body=json.dumps({"errors": {"message": "Fake Error"}}),
     )
     with pytest.raises(gasbuddy.exceptions.APIError):
-        data = await gasbuddy.GasBuddy().price_lookup_gps(lat=1234, lon=5678)
+        data = await gasbuddy.GasBuddy().price_lookup_service(lat=1234, lon=5678)

@@ -171,14 +171,19 @@ class GasBuddy:
 
         return data
 
-    async def price_lookup_gps(
+    async def price_lookup_service(
         self,
-        lat: float,
-        lon: float,
+        lat: float | None = None,
+        lon: float | None = None,
+        zipcode: int | None = None,
         limit: int = 5,
     ) -> dict[str, Any] | None:
         """Return gas price of station_id."""
-        variables = {"maxAge": 0, "lat": lat, "lng": lon}
+        variables: dict[str, Any] = {}
+        if lat is not None and lon is not None:
+            variables = {"maxAge": 0, "lat": lat, "lng": lon}
+        elif zipcode is not None:
+            variables = {"maxAge": 0, "search": str(zipcode)}
         query = {
             "operationName": "LocationBySearchTerm",
             "query": LOCATION_QUERY_PRICES,
@@ -188,7 +193,7 @@ class GasBuddy:
         # Parse and format data into easy to use dict
         response = await self.process_request(query)
 
-        _LOGGER.debug("price_lookup_gps response: %s", response)
+        _LOGGER.debug("price_lookup_service response: %s", response)
 
         if "error" in response.keys():
             message = response["error"]
@@ -205,6 +210,29 @@ class GasBuddy:
             )
             raise APIError
 
+        result_list = await self._parse_results(response, limit)
+        _LOGGER.debug("result data: %s", result_list)
+        value: dict[Any, Any] = {}
+        value["results"] = result_list
+        trend_data = await self._parse_trends(response)
+        if trend_data:
+            value["trend"] = trend_data
+            _LOGGER.debug("trend data: %s", trend_data)
+        return value
+
+    async def _parse_trends(self, response: dict) -> dict | None:
+        """Parse API results and return trend dict."""
+        trend_data: dict[str, Any] = {}
+        if response["data"]["locationBySearchTerm"]["trends"][0]:
+            result = response["data"]["locationBySearchTerm"]["trends"][0]
+            trend_data["trend"] = {}
+            trend_data["trend"]["average_price"] = result["today"]
+            trend_data["trend"]["lowest_price"] = result["todayLow"]
+            trend_data["trend"]["area"] = result["areaName"]
+        return trend_data
+
+    async def _parse_results(self, response: dict, limit: int) -> list:
+        """Parse API results and return price data list."""
         result_list = []
         for result in response["data"]["locationBySearchTerm"]["stations"]["results"]:
             if limit <= 0:
@@ -246,7 +274,4 @@ class GasBuddy:
                         "last_updated": price["credit"]["postedTime"],
                     }
             result_list.append(price_data)
-        _LOGGER.debug("final data: %s", result_list)
-        value = {}
-        value["results"] = result_list
-        return value
+        return result_list
