@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import statistics
 from typing import Any, Collection
 
 import aiohttp  # type: ignore
