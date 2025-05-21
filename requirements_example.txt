@@ -1,0 +1,3 @@
+aiohttp
+asyncio
+py_gasbuddy
