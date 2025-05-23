@@ -38,8 +38,7 @@ class GasBuddy:
     ) -> dict[str, Any]:
         """Process API requests."""
         headers = DEFAULT_HEADERS
-        if self._tag == "":
-            await self._get_headders()
+        await self._get_headders()
         headers["gbcsrf"] = self._tag
 
         async with aiohttp.ClientSession(headers=headers) as session:
