@@ -8,6 +8,7 @@ PROJECT_DIR = Path(__file__).parent.resolve()
 README_FILE = PROJECT_DIR / "README.md"
 VERSION = "0.3.2"
 
+
 setup(
     name="py_gasbuddy",
     version=VERSION,
