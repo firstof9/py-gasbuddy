@@ -315,9 +315,4 @@ class GasBuddy:
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, url)
-                message = {"error": ERROR_TIMEOUT}
-            except ContentTypeError as err:
-                _LOGGER.error("%s", err)
-                message = {"error": err}
-
             await session.close()

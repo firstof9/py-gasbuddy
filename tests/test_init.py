@@ -227,3 +227,27 @@ async def test_price_lookup_service(mock_aioclient, caplog):
     )
     with pytest.raises(gasbuddy.exceptions.APIError):
         data = await gasbuddy.GasBuddy().price_lookup_service(lat=1234, lon=5678)
+
+async def test_header_errors(mock_aioclient, caplog):
+    """Test price_lookup function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=404,
+        body="Not Found"
+    )
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("station.json"),
+        repeat=True,
+    )
+    await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    assert "An error reteiving data from the server, code: 404\nmessage: Not Found" in caplog.text
+    mock_aioclient.get(
+        GB_URL,
+        status=404,
+        exception=ServerTimeoutError,
+    )
+    with caplog.at_level(logging.DEBUG):
+        await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    assert "Timeout while updating: https://www.gasbuddy.com/home" in caplog.text
