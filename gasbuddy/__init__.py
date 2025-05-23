@@ -29,12 +29,18 @@ class GasBuddy:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
         self._id = station_id
+        self._tag = ""
 
     async def process_request(
         self, query: dict[str, Collection[str]]
     ) -> dict[str, Any]:
         """Process API requests."""
-        async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
+        headers = DEFAULT_HEADERS
+        if self._tag == "":
+            await self._get_headders()
+        headers["gbcsrf"] = self._tag
+
+        async with aiohttp.ClientSession(headers=headers) as session:
             json_query: str = json.dumps(query)
             _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
             try:
@@ -274,3 +280,44 @@ class GasBuddy:
                     }
             result_list.append(price_data)
         return result_list
+
+    async def _get_headders(self) -> None:
+        """Get required headers."""
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/136.0.0.0 Safari/537.36"
+            ),
+            "apollo-require-preflight": "true",
+            "Origin": "https://www.gasbuddy.com",
+            "Referer": "https://www.gasbuddy.com/home",
+        }
+        url = "https://www.gasbuddy.com/home"
+        async with aiohttp.ClientSession(headers=headers) as session:
+            try:
+                async with session.get(url) as response:
+                    message: dict[str, Any] | Any = {}
+                    message = await response.text()
+                    if response.status != 200:
+                        _LOGGER.error(  # pylint: disable-next=line-too-long
+                            "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
+                            response.status,
+                            message,
+                        )
+                        return
+
+                    self._tag = (
+                        response.headers.get("gbcsrf")
+                        if response.headers.get("gbcsrf")
+                        else None
+                    )
+
+            except (TimeoutError, ServerTimeoutError):
+                _LOGGER.error("%s: %s", ERROR_TIMEOUT, url)
+                message = {"error": ERROR_TIMEOUT}
+            except ContentTypeError as err:
+                _LOGGER.error("%s", err)
+                message = {"error": err}
+
+            await session.close()

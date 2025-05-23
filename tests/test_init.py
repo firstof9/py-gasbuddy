@@ -12,10 +12,19 @@ from tests.common import load_fixture
 pytestmark = pytest.mark.asyncio
 
 TEST_URL = "https://www.gasbuddy.com/graphql"
+GB_URL = "https://www.gasbuddy.com/home"
 
 
 async def test_location_search(mock_aioclient):
     """Test location_search function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        headers={
+            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
+        },
+        repeat=True,
+    )
     mock_aioclient.post(
         TEST_URL,
         status=200,
@@ -30,6 +39,14 @@ async def test_location_search(mock_aioclient):
 
 async def test_location_search_timeout(mock_aioclient, caplog):
     """Test server timeout exception handling."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        headers={
+            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
+        },
+        repeat=True,
+    )
     mock_aioclient.post(
         TEST_URL,
         exception=ServerTimeoutError,
@@ -52,6 +69,14 @@ async def test_location_search_exception(mock_aioclient):
 
 async def test_price_lookup(mock_aioclient):
     """Test price_lookup function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        headers={
+            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
+        },
+        repeat=True,
+    )
     mock_aioclient.post(
         TEST_URL,
         status=200,
@@ -91,6 +116,14 @@ async def test_price_lookup(mock_aioclient):
 
 async def test_price_lookup_service(mock_aioclient, caplog):
     """Test price_lookup function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        headers={
+            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
+        },
+        repeat=True,
+    )
     mock_aioclient.post(
         TEST_URL,
         status=200,
