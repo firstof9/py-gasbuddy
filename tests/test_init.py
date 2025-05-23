@@ -15,14 +15,12 @@ TEST_URL = "https://www.gasbuddy.com/graphql"
 GB_URL = "https://www.gasbuddy.com/home"
 
 
-async def test_location_search(mock_aioclient):
+async def test_location_search(mock_aioclient, caplog):
     """Test location_search function."""
     mock_aioclient.get(
         GB_URL,
         status=200,
-        headers={
-            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
-        },
+        body=load_fixture("index.html"),
         repeat=True,
     )
     mock_aioclient.post(
@@ -30,11 +28,13 @@ async def test_location_search(mock_aioclient):
         status=200,
         body=load_fixture("location.json"),
     )
-    data = await gasbuddy.GasBuddy().location_search(zipcode=12345)
+    with caplog.at_level(logging.DEBUG):
+        data = await gasbuddy.GasBuddy().location_search(zipcode=12345)
 
     assert (
         data["data"]["locationBySearchTerm"]["stations"]["results"][0]["id"] == "187725"
     )
+    assert "CSRF token found: 1.+Qw4hH/vdM0Kvscg" in caplog.text
 
 
 async def test_location_search_timeout(mock_aioclient, caplog):
@@ -42,9 +42,7 @@ async def test_location_search_timeout(mock_aioclient, caplog):
     mock_aioclient.get(
         GB_URL,
         status=200,
-        headers={
-            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
-        },
+        body=load_fixture("index.html"),
         repeat=True,
     )
     mock_aioclient.post(
@@ -72,9 +70,7 @@ async def test_price_lookup(mock_aioclient):
     mock_aioclient.get(
         GB_URL,
         status=200,
-        headers={
-            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
-        },
+        body=load_fixture("index.html"),
         repeat=True,
     )
     mock_aioclient.post(
@@ -119,9 +115,7 @@ async def test_price_lookup_service(mock_aioclient, caplog):
     mock_aioclient.get(
         GB_URL,
         status=200,
-        headers={
-            "gbcsrf": "1.i+hEh7FkvCjr/eBk",
-        },
+        body=load_fixture("index.html"),
         repeat=True,
     )
     mock_aioclient.post(
@@ -250,4 +244,14 @@ async def test_header_errors(mock_aioclient, caplog):
     )
     with caplog.at_level(logging.DEBUG):
         await gasbuddy.GasBuddy(station_id=205033).price_lookup()
-    assert "Timeout while updating: https://www.gasbuddy.com/home" in caplog.text
+    assert (
+        "Timeout wile getting CSRF tokens: https://www.gasbuddy.com/home" in caplog.text
+    )
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body="<html></html>",
+    )
+    with caplog.at_level(logging.DEBUG):
+        await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    assert "CSRF token not found." in caplog.text

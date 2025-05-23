@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Any, Collection
 
 import aiohttp  # type: ignore
@@ -19,6 +20,7 @@ from .consts import (
 from .exceptions import APIError, LibraryError, MissingSearchData
 
 ERROR_TIMEOUT = "Timeout while updating"
+CSRF_TIMEOUT = "Timeout wile getting CSRF tokens"
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -297,7 +299,7 @@ class GasBuddy:
         async with aiohttp.ClientSession(headers=headers) as session:
             try:
                 async with session.get(url) as response:
-                    message: dict[str, Any] | Any = {}
+                    message: str = ""
                     message = await response.text()
                     if response.status != 200:
                         _LOGGER.error(  # pylint: disable-next=line-too-long
@@ -307,12 +309,14 @@ class GasBuddy:
                         )
                         return
 
-                    self._tag = (
-                        response.headers.get("gbcsrf")
-                        if response.headers.get("gbcsrf")
-                        else None
-                    )
+                    pattern = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
+                    found = pattern.search(message)
+                    if found is not None:
+                        self._tag = found.group(2)
+                        _LOGGER.debug("CSRF token found: %s", self._tag)
+                    else:
+                        _LOGGER.error("CSRF token not found.")
 
             except (TimeoutError, ServerTimeoutError):
-                _LOGGER.error("%s: %s", ERROR_TIMEOUT, url)
+                _LOGGER.error("%s: %s", CSRF_TIMEOUT, url)
             await session.close()
