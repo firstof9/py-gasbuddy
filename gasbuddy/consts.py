@@ -13,6 +13,11 @@ DEFAULT_HEADERS = {
     "gbcsrf": "1.i+hEh7FkvCjr/eBk",
     "Origin": "https://www.gasbuddy.com",
     "Referer": "https://www.gasbuddy.com/home",
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/136.0.0.0 Safari/537.36"
+    ),
 }
 # pylint: disable-next=line-too-long
 GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { brands { imageUrl } prices { cash { nickname postedTime price } credit { nickname postedTime price } fuelProduct longName } priceUnit currency id latitude longitude } }"  # pylint: disable-next=line-too-long

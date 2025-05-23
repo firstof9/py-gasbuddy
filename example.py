@@ -4,6 +4,7 @@
 import asyncio
 import gasbuddy
 
+
 async def main():
     """
     This script demonstrates basic usage of the gasbuddy library.
@@ -16,14 +17,16 @@ async def main():
         zip_code = "90210"  # Example zip code - Beverly Hills, CA
 
         # Initialize the GasBuddy API client
-        gb = gasbuddy.GasBuddy()        
+        gb = gasbuddy.GasBuddy()
 
         # Initialize the GasBuddy API client
         stations = await gb.location_search(zipcode=zip_code)
 
         if stations:
             print(f"Stations for Zip Code {zip_code}:")
-            for station in stations["data"]["locationBySearchTerm"]["stations"]["results"]:
+            for station in stations["data"]["locationBySearchTerm"]["stations"][
+                "results"
+            ]:
                 print(f"  - Station: {station["name"]}")
                 print(f"    Address: {station["address"]["line1"]}")
                 print(f"    ID: {station["id"]}")
