@@ -9,6 +9,7 @@ from typing import Any, Collection
 
 import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
+import backoff
 
 from .consts import (
     BASE_URL,
@@ -33,12 +34,13 @@ class GasBuddy:
         self._id = station_id
         self._tag = ""
 
+    @backoff.on_exception(backoff.expo, aiohttp.ClientError, max_time=60, max_tries=3)
     async def process_request(
         self, query: dict[str, Collection[str]]
     ) -> dict[str, Any]:
         """Process API requests."""
         headers = DEFAULT_HEADERS
-        await self._get_headders()
+        await self._get_headers()
         headers["gbcsrf"] = self._tag
 
         async with aiohttp.ClientSession(headers=headers) as session:
@@ -59,7 +61,8 @@ class GasBuddy:
                     except ValueError:
                         _LOGGER.warning("Non-JSON response: %s", message)
                         message = {"error": message}
-
+                    if response.status == 403:
+                        raise aiohttp.ClientError
                     if response.status != 200:
                         _LOGGER.error(  # pylint: disable-next=line-too-long
                             "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
@@ -282,7 +285,7 @@ class GasBuddy:
             result_list.append(price_data)
         return result_list
 
-    async def _get_headders(self) -> None:
+    async def _get_headers(self) -> None:
         """Get required headers."""
         headers = {
             "User-Agent": (
