@@ -255,3 +255,23 @@ async def test_header_errors(mock_aioclient, caplog):
     with caplog.at_level(logging.DEBUG):
         await gasbuddy.GasBuddy(station_id=205033).price_lookup()
     assert "CSRF token not found." in caplog.text
+
+
+async def test_retry_logic(mock_aioclient, caplog):
+    """Test retry logic."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+    mock_aioclient.post(
+        TEST_URL,
+        status=403,
+        body='<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title></html>',
+        repeat=True,
+    )
+    with caplog.at_level(logging.DEBUG):
+        with pytest.raises(gasbuddy.LibraryError):
+            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    assert "Retrying request..." in caplog.text

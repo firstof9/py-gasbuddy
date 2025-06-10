@@ -62,8 +62,8 @@ class GasBuddy:
                         _LOGGER.warning("Non-JSON response: %s", message)
                         message = {"error": message}
                     if response.status == 403:
-                        raise aiohttp.ClientError
-                    if response.status != 200:
+                        _LOGGER.debug("Retrying request...")
+                    elif response.status != 200:
                         _LOGGER.error(  # pylint: disable-next=line-too-long
                             "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
                             response.status,
