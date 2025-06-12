@@ -18,10 +18,11 @@ from .consts import (
     LOCATION_QUERY,
     LOCATION_QUERY_PRICES,
 )
-from .exceptions import APIError, LibraryError, MissingSearchData
+from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
 
 ERROR_TIMEOUT = "Timeout while updating"
 CSRF_TIMEOUT = "Timeout wile getting CSRF tokens"
+MAX_RETRIES = 5
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -34,7 +35,9 @@ class GasBuddy:
         self._id = station_id
         self._tag = ""
 
-    @backoff.on_exception(backoff.expo, aiohttp.ClientError, max_time=60, max_tries=3)
+    @backoff.on_exception(
+        backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
+    )
     async def process_request(
         self, query: dict[str, Collection[str]]
     ) -> dict[str, Any]:
@@ -285,19 +288,23 @@ class GasBuddy:
             result_list.append(price_data)
         return result_list
 
+    @backoff.on_exception(
+        backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
+    )
     async def _get_headers(self) -> None:
         """Get required headers."""
         headers = {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/136.0.0.0 Safari/537.36"
+                "Chrome/137.0.0.0 Safari/537.36"
             ),
             "apollo-require-preflight": "true",
             "Origin": "https://www.gasbuddy.com",
             "Referer": "https://www.gasbuddy.com/home",
         }
         url = "https://www.gasbuddy.com/home"
+
         async with aiohttp.ClientSession(headers=headers) as session:
             try:
                 async with session.get(url) as response:
@@ -318,6 +325,7 @@ class GasBuddy:
                         _LOGGER.debug("CSRF token found: %s", self._tag)
                     else:
                         _LOGGER.error("CSRF token not found.")
+                        raise CSRFTokenMissing
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", CSRF_TIMEOUT, url)
