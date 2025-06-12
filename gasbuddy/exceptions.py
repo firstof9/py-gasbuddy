@@ -11,3 +11,7 @@ class LibraryError(Exception):
 
 class APIError(Exception):
     """Exception for missing search data variable."""
+
+
+class CSRFTokenMissing(Exception):
+    """Exception for missing CSRF token."""

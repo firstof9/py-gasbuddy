@@ -253,7 +253,8 @@ async def test_header_errors(mock_aioclient, caplog):
         body="<html></html>",
     )
     with caplog.at_level(logging.DEBUG):
-        await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+        with pytest.raises(gasbuddy.CSRFTokenMissing):
+            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
     assert "CSRF token not found." in caplog.text
 
 
