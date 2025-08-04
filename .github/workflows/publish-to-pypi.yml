@@ -9,6 +9,8 @@ jobs:
   build-and-publish:
     name: Builds and publishes releases to PyPI
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.9
