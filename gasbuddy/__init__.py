@@ -29,10 +29,13 @@ _LOGGER = logging.getLogger(__name__)
 class GasBuddy:
     """Represent GasBuddy GraphQL calls."""
 
-    def __init__(self, station_id: int | None = None) -> None:
+    def __init__(
+        self, station_id: int | None = None, solver_url: str | None = None
+    ) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
         self._id = station_id
+        self._solver = solver_url
         self._tag = ""
 
     @backoff.on_exception(
@@ -304,10 +307,20 @@ class GasBuddy:
             "Referer": "https://www.gasbuddy.com/home",
         }
         url = "https://www.gasbuddy.com/home"
+        method = "get"
+
+        if self._solver:
+            json_data: Any = {}
+            json_data["cmd"] = "request.get"
+            json_data["url"] = url
+            json_data["headers"] = headers
+            url = self._solver
+            method = "post"
 
         async with aiohttp.ClientSession(headers=headers) as session:
+            http_method = getattr(session, method)
             try:
-                async with session.get(url) as response:
+                async with http_method(url) as response:
                     message: str = ""
                     message = await response.text()
                     if response.status != 200:
@@ -317,6 +330,10 @@ class GasBuddy:
                             message,
                         )
                         return
+
+                    # If we're using the solver parse the JSON response
+                    if self._solver:
+                        message = json.loads(message)["solution"]["response"]
 
                     pattern = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
                     found = pattern.search(message)

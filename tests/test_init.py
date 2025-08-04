@@ -13,6 +13,7 @@ pytestmark = pytest.mark.asyncio
 
 TEST_URL = "https://www.gasbuddy.com/graphql"
 GB_URL = "https://www.gasbuddy.com/home"
+SOLVER_URL = "http://solver.url"
 
 
 async def test_location_search(mock_aioclient, caplog):
@@ -276,3 +277,32 @@ async def test_retry_logic(mock_aioclient, caplog):
         with pytest.raises(gasbuddy.LibraryError):
             await gasbuddy.GasBuddy(station_id=205033).price_lookup()
     assert "Retrying request..." in caplog.text
+
+
+async def test_solver(mock_aioclient, caplog):
+    """Test location_search function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("location.json"),
+    )
+    mock_aioclient.post(
+        SOLVER_URL,
+        status=200,
+        body=load_fixture("solver_response.json"),
+    )
+    with caplog.at_level(logging.DEBUG):
+        data = await gasbuddy.GasBuddy(solver_url=SOLVER_URL).location_search(
+            zipcode=12345
+        )
+
+    assert (
+        data["data"]["locationBySearchTerm"]["stations"]["results"][0]["id"] == "187725"
+    )
+    assert "CSRF token found: 1.RiXH1tCtoqNhvBuo" in caplog.text
