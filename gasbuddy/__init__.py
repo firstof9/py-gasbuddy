@@ -308,9 +308,9 @@ class GasBuddy:
         }
         url = "https://www.gasbuddy.com/home"
         method = "get"
+        json_data: Any = {}
 
         if self._solver:
-            json_data: Any = {}
             json_data["cmd"] = "request.get"
             json_data["url"] = url
             json_data["headers"] = headers
@@ -319,8 +319,9 @@ class GasBuddy:
 
         async with aiohttp.ClientSession(headers=headers) as session:
             http_method = getattr(session, method)
+            _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:
-                async with http_method(url) as response:
+                async with http_method(url, data=json_data) as response:
                     message: str = ""
                     message = await response.text()
                     if response.status != 200:
