@@ -321,7 +321,7 @@ class GasBuddy:
             http_method = getattr(session, method)
             _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:
-                async with http_method(url, data=json_data) as response:
+                async with http_method(url, json=json_data) as response:
                     message: str = ""
                     message = await response.text()
                     if response.status != 200:
