@@ -326,3 +326,14 @@ async def test_price_lookup(mock_aioclient, caplog):
             await gasbuddy.GasBuddy(station_id=205033).price_lookup()
 
     assert "An error occured attempting to retrieve the data: Published deal alerts not found" in caplog.text
+
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body='{"errors": "error"}',
+    )
+    with caplog.at_level(logging.DEBUG):
+        with pytest.raises(gasbuddy.APIError):    
+            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+
+    assert "An error occured attempting to retrieve the data: Server side error occured." in caplog.text    
