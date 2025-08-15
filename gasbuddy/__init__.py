@@ -133,7 +133,13 @@ class GasBuddy:
             )
             raise LibraryError
         if "errors" in response.keys():
-            message = response["errors"]["message"]
+            try:
+                message = response["errors"]["message"]
+            except (ValueError, TypeError):
+                try:
+                    message = response["errors"][0]["message"]
+                except:
+                    message = "Server side error occured."
             _LOGGER.error(
                 "An error occured attempting to retrieve the data: %s",
                 message,
