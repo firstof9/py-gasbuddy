@@ -111,7 +111,8 @@ async def test_price_lookup(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station2.json"),
     )
-    data = await gasbuddy.GasBuddy(station_id=197274).price_lookup()
+    manager = gasbuddy.GasBuddy(station_id=197274,cache_file="test_cache")
+    data = await manager.price_lookup()
 
     assert data["station_id"] == "197274"
     assert data["regular_gas"]["price"] == 131.9
@@ -123,6 +124,8 @@ async def test_price_lookup(mock_aioclient, caplog):
     assert data["latitude"] == 53.3066
     assert data["longitude"] == -113.5559
     assert data["image_url"] == "https://images.gasbuddy.io/b/117.png"
+
+    await manager.clear_cache()
 
 
 async def test_price_lookup_service(mock_aioclient, caplog):
