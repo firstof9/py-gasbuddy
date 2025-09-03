@@ -335,11 +335,13 @@ class GasBuddy:
         else:
             self._cache_manager = GasBuddyCache()
 
-        if await self._cache_manager.cache_exists() and self._cf_last:
+        if await self._cache_manager.cache_exists():
             _LOGGER.debug("Found cache file, reading...")
             cache_data = await self._cache_manager.read_cache()
-            self._tag = cache_data[TOKEN]
-            return
+            if isinstance(cache_data, dict) and TOKEN in cache_data:
+                self._tag = cache_data[TOKEN]
+            else:
+                self._tag = ""
         else:
             _LOGGER.debug("No cache file found, creating...")
 
@@ -349,6 +351,11 @@ class GasBuddy:
             json_data["headers"] = headers
             url = self._solver
             method = "post"
+
+        if self._cf_last:
+            return
+
+        _LOGGER.debug("Token invalid, getting a new one...")
 
         async with aiohttp.ClientSession(headers=headers) as session:
             http_method = getattr(session, method)
