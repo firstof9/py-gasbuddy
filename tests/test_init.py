@@ -111,7 +111,7 @@ async def test_price_lookup(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station2.json"),
     )
-    manager = gasbuddy.GasBuddy(station_id=197274,cache_file="test_cache")
+    manager = gasbuddy.GasBuddy(station_id=197274,cache_file="cache/test_cache")
     data = await manager.price_lookup()
 
     assert data["station_id"] == "197274"
