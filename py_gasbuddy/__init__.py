@@ -42,9 +42,9 @@ class GasBuddy:
         self._id = station_id
         self._solver = solver_url
         self._tag = ""
-        self._cf_last = None
+        self._cf_last: bool | None = None
         self._cache_file = cache_file
-        self._cache_manager = None
+        self._cache_manager: GasBuddyCache | None = None
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
