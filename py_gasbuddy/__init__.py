@@ -7,7 +7,7 @@ import logging
 import re
 from typing import Any, Collection
 
-import aiohttp  # type: ignore
+import aiohttp
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 import backoff
 
