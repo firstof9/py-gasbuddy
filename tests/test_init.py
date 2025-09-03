@@ -432,3 +432,21 @@ async def test_cache_json_error(mock_aioclient, caplog):
         assert "Invalid JSON data" in caplog.text
     await manager.clear_cache()
     
+async def test_read_no_file(mock_aioclient, caplog):
+    """Test clear_cache function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("station.json"),
+    )
+    manager = gasbuddy.GasBuddy(station_id=205033)
+    with caplog.at_level(logging.DEBUG):
+        manager._cache_manager = gasbuddy.cache.GasBuddyCache()
+        data = await manager._cache_manager.read_cache()
+        assert data == {}
