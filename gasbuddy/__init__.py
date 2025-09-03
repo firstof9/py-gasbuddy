@@ -17,6 +17,7 @@ from .consts import (
     GAS_PRICE_QUERY,
     LOCATION_QUERY,
     LOCATION_QUERY_PRICES,
+    TOKEN_SKIP,
 )
 from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
 
@@ -52,7 +53,7 @@ class GasBuddy:
         except CSRFTokenMissing:
             _LOGGER.error("Skipping request due to missing token.")
             return {"error": "Missing Token"}
-        
+
         headers["gbcsrf"] = self._tag
 
         async with aiohttp.ClientSession(headers=headers) as session:
@@ -148,7 +149,7 @@ class GasBuddy:
             except (ValueError, TypeError):
                 try:
                     message = response["errors"][0]["message"]
-                except:
+                except (IndexError, ValueError, TypeError):
                     message = "Server side error occured."
             _LOGGER.error(
                 "An error occured attempting to retrieve the data: %s",
@@ -334,9 +335,7 @@ class GasBuddy:
             method = "post"
 
         if self._tag != "" and self._cf_last:
-            _LOGGER.debug(
-                "Already have token and last call was successful. Skipping token search."
-            )
+            _LOGGER.debug(TOKEN_SKIP)
             return
 
         async with aiohttp.ClientSession(headers=headers) as session:

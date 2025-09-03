@@ -358,3 +358,17 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
         "An error occured attempting to retrieve the data: Server side error occured."
         in caplog.text
     )
+
+    mock_aioclient.post(
+        TEST_URL,
+        status=404,
+        body="Not Found",
+    )
+    with caplog.at_level(logging.DEBUG):
+        with pytest.raises(gasbuddy.LibraryError):
+            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+
+    assert (
+        "An error occured attempting to retrieve the data: {'error': 'Not Found'}"
+        in caplog.text
+    )
