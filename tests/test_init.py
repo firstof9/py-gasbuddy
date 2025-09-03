@@ -80,7 +80,10 @@ async def test_price_lookup(mock_aioclient, caplog):
         body=load_fixture("station.json"),
     )
     manager = gasbuddy.GasBuddy(station_id=205033)
-    data = await manager.price_lookup()
+    with caplog.at_level(logging.DEBUG):
+        data = await manager.price_lookup()
+
+        assert "No cache file found, creating..." in caplog.text
 
     assert data["station_id"] == "205033"
     assert data["regular_gas"]["price"] == 3.27
@@ -101,10 +104,7 @@ async def test_price_lookup(mock_aioclient, caplog):
 
     with caplog.at_level(logging.DEBUG):
         await manager.price_lookup()
-        assert (
-            "Already have token and last call was successful. Skipping token search."
-            in caplog.text
-        )
+        assert "Found cache file, reading..." in caplog.text
 
     mock_aioclient.post(
         TEST_URL,
@@ -372,3 +372,20 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
         "An error occured attempting to retrieve the data: {'error': 'Not Found'}"
         in caplog.text
     )
+
+async def test_clear_cache(mock_aioclient, caplog):
+    """Test clear_cache function."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("station.json"),
+    )
+    manager = gasbuddy.GasBuddy(station_id=205033)
+    await manager.price_lookup()
+    await manager.clear_cache()

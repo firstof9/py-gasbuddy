@@ -19,7 +19,6 @@ from .consts import (
     LOCATION_QUERY,
     LOCATION_QUERY_PRICES,
     TOKEN,
-    TOKEN_SKIP,
 )
 from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
 
@@ -42,6 +41,7 @@ class GasBuddy:
         self._tag = ""
         self._cf_last = False
         self._cache_file = cache_file
+        self._cache_manager = None
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -330,14 +330,14 @@ class GasBuddy:
         method = "get"
         json_data: Any = {}
 
-        if self._cache_file:
-            cache = GasBuddyCache(self._cache_file)
+        if self._cache_file and self._cache_manager is None:
+            self._cache_manager = GasBuddyCache(self._cache_file)
         else:
-            cache = GasBuddyCache()
+            self._cache_manager = GasBuddyCache()
 
-        if await cache.cache_exists() and self._cf_last:
+        if await self._cache_manager.cache_exists() and self._cf_last:
             _LOGGER.debug("Found cache file, reading...")
-            cache_data = await cache.read_cache()
+            cache_data = await self._cache_manager.read_cache()
             self._tag = cache_data[TOKEN]
             return
         else:
@@ -349,10 +349,6 @@ class GasBuddy:
             json_data["headers"] = headers
             url = self._solver
             method = "post"
-
-        if self._tag != "" and self._cf_last:
-            _LOGGER.debug(TOKEN_SKIP)
-            return
 
         async with aiohttp.ClientSession(headers=headers) as session:
             http_method = getattr(session, method)
@@ -381,7 +377,7 @@ class GasBuddy:
                         data[TOKEN] = self._tag
                         json_data = json.dumps(data).encode("utf-8")
                         _LOGGER.debug("CSRF token found: %s", self._tag)
-                        await cache.write_cache(json_data)
+                        await self._cache_manager.write_cache(json_data)
                     else:
                         _LOGGER.error("CSRF token not found.")
                         raise CSRFTokenMissing
@@ -389,3 +385,10 @@ class GasBuddy:
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", CSRF_TIMEOUT, url)
             await session.close()
+
+    async def clear_cache(self) -> None:
+        """Clear cache file."""
+        if self._cache_manager is None:
+            return
+        else:
+            await self._cache_manager.clear_cache()
