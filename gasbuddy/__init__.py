@@ -37,6 +37,7 @@ class GasBuddy:
         self._id = station_id
         self._solver = solver_url
         self._tag = ""
+        self._cf_last = False
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -46,7 +47,12 @@ class GasBuddy:
     ) -> dict[str, Any]:
         """Process API requests."""
         headers = DEFAULT_HEADERS
-        await self._get_headers()
+        try:
+            await self._get_headers()
+        except CSRFTokenMissing:
+            _LOGGER.error("Skipping request due to missing token.")
+            return {"error": "Missing Token"}
+        
         headers["gbcsrf"] = self._tag
 
         async with aiohttp.ClientSession(headers=headers) as session:
@@ -64,11 +70,14 @@ class GasBuddy:
 
                     try:
                         message = json.loads(message)
+                        self._cf_last = True
                     except ValueError:
                         _LOGGER.warning("Non-JSON response: %s", message)
                         message = {"error": message}
+                        self._cf_last = False
                     if response.status == 403:
                         _LOGGER.debug("Retrying request...")
+                        self._cf_last = False
                     elif response.status != 200:
                         _LOGGER.error(  # pylint: disable-next=line-too-long
                             "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
@@ -76,6 +85,7 @@ class GasBuddy:
                             message,
                         )
                         message = {"error": message}
+                        self._cf_last = False
                     return message
 
             except (TimeoutError, ServerTimeoutError):
@@ -322,6 +332,12 @@ class GasBuddy:
             json_data["headers"] = headers
             url = self._solver
             method = "post"
+
+        if self._tag != "" and self._cf_last:
+            _LOGGER.debug(
+                "Already have token and last call was successful. Skipping token search."
+            )
+            return
 
         async with aiohttp.ClientSession(headers=headers) as session:
             http_method = getattr(session, method)
