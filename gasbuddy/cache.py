@@ -1,4 +1,4 @@
-""" Cache functions for py-gasbuddy."""
+"""Cache functions for py-gasbuddy."""
 
 import json
 import logging

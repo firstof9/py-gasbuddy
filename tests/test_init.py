@@ -119,7 +119,7 @@ async def test_price_lookup(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station2.json"),
     )
-    manager = gasbuddy.GasBuddy(station_id=197274,cache_file="cache/test_cache")
+    manager = gasbuddy.GasBuddy(station_id=197274, cache_file="cache/test_cache")
     data = await manager.price_lookup()
 
     assert data["station_id"] == "197274"
@@ -255,7 +255,6 @@ async def test_price_lookup_service(mock_aioclient, caplog):
     await manager.clear_cache()
 
 
-
 async def test_header_errors(mock_aioclient, caplog):
     """Test price_lookup function."""
     mock_aioclient.get(GB_URL, status=404, body="Not Found")
@@ -276,7 +275,8 @@ async def test_header_errors(mock_aioclient, caplog):
         exception=ServerTimeoutError,
     )
     with caplog.at_level(logging.DEBUG):
-        await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+        manager = gasbuddy.GasBuddy(station_id=205033)
+        await manager.price_lookup()
     assert (
         "Timeout wile getting CSRF tokens: https://www.gasbuddy.com/home" in caplog.text
     )
@@ -287,9 +287,11 @@ async def test_header_errors(mock_aioclient, caplog):
     )
     with caplog.at_level(logging.DEBUG):
         with pytest.raises(gasbuddy.LibraryError):
-            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+            manager = gasbuddy.GasBuddy(station_id=205033)
+            await manager.price_lookup()
     assert "CSRF token not found." in caplog.text
     assert "Skipping request due to missing token." in caplog.text
+    await manager.clear_cache()
 
 
 async def test_retry_logic(mock_aioclient, caplog):
@@ -308,8 +310,10 @@ async def test_retry_logic(mock_aioclient, caplog):
     )
     with caplog.at_level(logging.DEBUG):
         with pytest.raises(gasbuddy.LibraryError):
-            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+            manager = gasbuddy.GasBuddy(station_id=205033)
+            await manager.price_lookup()
     assert "Retrying request..." in caplog.text
+    await manager.clear_cache()
 
 
 async def test_solver(mock_aioclient, caplog):
@@ -331,14 +335,14 @@ async def test_solver(mock_aioclient, caplog):
         body=load_fixture("solver_response.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        data = await gasbuddy.GasBuddy(solver_url=SOLVER_URL).location_search(
-            zipcode=12345
-        )
+        manager = gasbuddy.GasBuddy(solver_url=SOLVER_URL)
+        data = await manager.location_search(zipcode=12345)
 
     assert (
         data["data"]["locationBySearchTerm"]["stations"]["results"][0]["id"] == "187725"
     )
     assert "CSRF token found: 1.RiXH1tCtoqNhvBuo" in caplog.text
+    await manager.clear_cache()
 
 
 async def test_price_lookup_api_error(mock_aioclient, caplog):
@@ -384,12 +388,15 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
     )
     with caplog.at_level(logging.DEBUG):
         with pytest.raises(gasbuddy.LibraryError):
-            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+            manager = gasbuddy.GasBuddy(station_id=205033)
+            await manager.price_lookup()
 
     assert (
         "An error occured attempting to retrieve the data: {'error': 'Not Found'}"
         in caplog.text
     )
+    await manager.clear_cache()
+
 
 async def test_clear_cache(mock_aioclient, caplog):
     """Test clear_cache function."""
@@ -408,12 +415,13 @@ async def test_clear_cache(mock_aioclient, caplog):
     await manager.price_lookup()
     await manager.clear_cache()
 
+
 async def test_cache_json_error(mock_aioclient, caplog):
     """Test JSON error in cache read."""
     # Setup invalid cache file
     file_name = "gasbuddy/gasbuddy_cache"
     async with aiofiles.open(file_name, mode="w") as file:
-        await file.write("lajdhfo98423hrujrna;ldifuhp8h4r984h32ioufhahudfhi2h398rhudn")    
+        await file.write("lajdhfo98423hrujrna;ldifuhp8h4r984h32ioufhahudfhi2h398rhudn")
 
     mock_aioclient.get(
         GB_URL,
@@ -431,7 +439,8 @@ async def test_cache_json_error(mock_aioclient, caplog):
         await manager.price_lookup()
         assert "Invalid JSON data" in caplog.text
     await manager.clear_cache()
-    
+
+
 async def test_read_no_file(mock_aioclient, caplog):
     """Test clear_cache function."""
     mock_aioclient.get(

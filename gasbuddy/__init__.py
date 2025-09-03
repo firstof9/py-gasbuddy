@@ -32,14 +32,17 @@ class GasBuddy:
     """Represent GasBuddy GraphQL calls."""
 
     def __init__(
-        self, station_id: int | None = None, solver_url: str | None = None, cache_file: str = ""
+        self,
+        station_id: int | None = None,
+        solver_url: str | None = None,
+        cache_file: str = "",
     ) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
         self._id = station_id
         self._solver = solver_url
         self._tag = ""
-        self._cf_last = False
+        self._cf_last = None
         self._cache_file = cache_file
         self._cache_manager = None
 
@@ -344,6 +347,7 @@ class GasBuddy:
                 self._tag = ""
         else:
             _LOGGER.debug("No cache file found, creating...")
+            self._cf_last = False
 
         if self._solver:
             json_data["cmd"] = "request.get"
@@ -352,7 +356,7 @@ class GasBuddy:
             url = self._solver
             method = "post"
 
-        if self._cf_last:
+        if self._cf_last is None or self._cf_last:
             return
 
         _LOGGER.debug("Token invalid, getting a new one...")
