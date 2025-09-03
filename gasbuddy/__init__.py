@@ -11,13 +11,14 @@ import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 import backoff
 
+from .cache import GasBuddyCache
 from .consts import (
     BASE_URL,
     DEFAULT_HEADERS,
     GAS_PRICE_QUERY,
     LOCATION_QUERY,
     LOCATION_QUERY_PRICES,
-    TOKEN_SKIP,
+    TOKEN,
 )
 from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
 
@@ -31,14 +32,19 @@ class GasBuddy:
     """Represent GasBuddy GraphQL calls."""
 
     def __init__(
-        self, station_id: int | None = None, solver_url: str | None = None
+        self,
+        station_id: int | None = None,
+        solver_url: str | None = None,
+        cache_file: str = "",
     ) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
         self._id = station_id
         self._solver = solver_url
         self._tag = ""
-        self._cf_last = False
+        self._cf_last = None
+        self._cache_file = cache_file
+        self._cache_manager = None
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -327,6 +333,22 @@ class GasBuddy:
         method = "get"
         json_data: Any = {}
 
+        if self._cache_file and self._cache_manager is None:
+            self._cache_manager = GasBuddyCache(self._cache_file)
+        else:
+            self._cache_manager = GasBuddyCache()
+
+        if await self._cache_manager.cache_exists():
+            _LOGGER.debug("Found cache file, reading...")
+            cache_data = await self._cache_manager.read_cache()
+            if isinstance(cache_data, dict) and TOKEN in cache_data:
+                self._tag = cache_data[TOKEN]
+            else:
+                self._tag = ""
+        else:
+            _LOGGER.debug("No cache file found, creating...")
+            self._cf_last = False
+
         if self._solver:
             json_data["cmd"] = "request.get"
             json_data["url"] = url
@@ -334,9 +356,10 @@ class GasBuddy:
             url = self._solver
             method = "post"
 
-        if self._tag != "" and self._cf_last:
-            _LOGGER.debug(TOKEN_SKIP)
+        if self._cf_last is None or self._cf_last:
             return
+
+        _LOGGER.debug("Token invalid, getting a new one...")
 
         async with aiohttp.ClientSession(headers=headers) as session:
             http_method = getattr(session, method)
@@ -360,8 +383,12 @@ class GasBuddy:
                     pattern = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
                     found = pattern.search(message)
                     if found is not None:
+                        data = {}
                         self._tag = found.group(2)
+                        data[TOKEN] = self._tag
+                        json_data = json.dumps(data).encode("utf-8")
                         _LOGGER.debug("CSRF token found: %s", self._tag)
+                        await self._cache_manager.write_cache(json_data)
                     else:
                         _LOGGER.error("CSRF token not found.")
                         raise CSRFTokenMissing
@@ -369,3 +396,8 @@ class GasBuddy:
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", CSRF_TIMEOUT, url)
             await session.close()
+
+    async def clear_cache(self) -> None:
+        """Clear cache file."""
+        if self._cache_manager:
+            await self._cache_manager.clear_cache()
