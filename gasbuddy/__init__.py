@@ -11,12 +11,14 @@ import aiohttp  # type: ignore
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 import backoff
 
+from .cache import GasBuddyCache
 from .consts import (
     BASE_URL,
     DEFAULT_HEADERS,
     GAS_PRICE_QUERY,
     LOCATION_QUERY,
     LOCATION_QUERY_PRICES,
+    TOKEN,
     TOKEN_SKIP,
 )
 from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
@@ -31,7 +33,7 @@ class GasBuddy:
     """Represent GasBuddy GraphQL calls."""
 
     def __init__(
-        self, station_id: int | None = None, solver_url: str | None = None
+        self, station_id: int | None = None, solver_url: str | None = None, cache_file: str = ""
     ) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
@@ -39,6 +41,7 @@ class GasBuddy:
         self._solver = solver_url
         self._tag = ""
         self._cf_last = False
+        self._cache_file = cache_file
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -327,6 +330,19 @@ class GasBuddy:
         method = "get"
         json_data: Any = {}
 
+        if self._cache_file:
+            cache = GasBuddyCache(self._cache_file)
+        else:
+            cache = GasBuddyCache()
+
+        if await cache.cache_exists() and self._cf_last:
+            _LOGGER.debug("Found cache file, reading...")
+            cache_data = await cache.read_cache()
+            self._tag = cache_data[TOKEN]
+            return
+        else:
+            _LOGGER.debug("No cache file found, creating...")
+
         if self._solver:
             json_data["cmd"] = "request.get"
             json_data["url"] = url
@@ -360,8 +376,12 @@ class GasBuddy:
                     pattern = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
                     found = pattern.search(message)
                     if found is not None:
+                        data = {}
                         self._tag = found.group(2)
+                        data[TOKEN] = self._tag
+                        json_data = json.dumps(data).encode("utf-8")
                         _LOGGER.debug("CSRF token found: %s", self._tag)
+                        await cache.write_cache(json_data)
                     else:
                         _LOGGER.error("CSRF token not found.")
                         raise CSRFTokenMissing

@@ -18,6 +18,7 @@ DEFAULT_HEADERS = {
         "Chrome/137.0.0.0 Safari/537.36"
     ),
 }
+TOKEN = "token"
 TOKEN_SKIP = "Already have token and last call was successful. Skipping token search."
 # pylint: disable-next=line-too-long
 GAS_PRICE_QUERY = "query GetStation($id: ID!) { station(id: $id) { brands { imageUrl } prices { cash { nickname postedTime price } credit { nickname postedTime price } fuelProduct longName } priceUnit currency id latitude longitude } }"  # pylint: disable-next=line-too-long
