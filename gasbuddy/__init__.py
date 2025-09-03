@@ -388,7 +388,5 @@ class GasBuddy:
 
     async def clear_cache(self) -> None:
         """Clear cache file."""
-        if self._cache_manager is None:
-            return
-        else:
+        if self._cache_manager:
             await self._cache_manager.clear_cache()
