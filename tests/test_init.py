@@ -8,7 +8,7 @@ from aiohttp.client_exceptions import ServerTimeoutError
 
 import aiofiles
 import aiofiles.os
-import gasbuddy
+import py_gasbuddy
 from tests.common import load_fixture
 
 pytestmark = pytest.mark.asyncio
@@ -32,7 +32,7 @@ async def test_location_search(mock_aioclient, caplog):
         body=load_fixture("location.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy()
+        manager = py_gasbuddy.GasBuddy()
         data = await manager.location_search(zipcode=12345)
 
     assert (
@@ -55,9 +55,9 @@ async def test_location_search_timeout(mock_aioclient, caplog):
         exception=ServerTimeoutError,
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy()
+        manager = py_gasbuddy.GasBuddy()
         await manager.location_search(zipcode=12345)
-    assert gasbuddy.ERROR_TIMEOUT in caplog.text
+    assert py_gasbuddy.ERROR_TIMEOUT in caplog.text
     await manager.clear_cache()
 
 
@@ -68,8 +68,8 @@ async def test_location_search_exception(mock_aioclient):
         status=200,
         body=load_fixture("location.json"),
     )
-    with pytest.raises(gasbuddy.MissingSearchData):
-        manager = gasbuddy.GasBuddy()
+    with pytest.raises(py_gasbuddy.MissingSearchData):
+        manager = py_gasbuddy.GasBuddy()
         await manager.location_search()
         await manager.clear_cache()
 
@@ -87,7 +87,7 @@ async def test_price_lookup(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station.json"),
     )
-    manager = gasbuddy.GasBuddy(station_id=205033)
+    manager = py_gasbuddy.GasBuddy(station_id=205033)
     with caplog.at_level(logging.DEBUG):
         data = await manager.price_lookup()
 
@@ -119,7 +119,7 @@ async def test_price_lookup(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station2.json"),
     )
-    manager = gasbuddy.GasBuddy(station_id=197274, cache_file="cache/test_cache")
+    manager = py_gasbuddy.GasBuddy(station_id=197274, cache_file="cache/test_cache")
     data = await manager.price_lookup()
 
     assert data["station_id"] == "197274"
@@ -150,7 +150,7 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         body=load_fixture("prices_gps.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy()
+        manager = py_gasbuddy.GasBuddy()
         data = await manager.price_lookup_service(lat=1234, lon=5678)
 
     assert isinstance(data, dict)
@@ -196,7 +196,7 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         body=load_fixture("prices_gps.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy()
+        manager = py_gasbuddy.GasBuddy()
         data = await manager.price_lookup_service(zipcode=12345)
 
     assert isinstance(data, dict)
@@ -241,8 +241,8 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         status=200,
         body="[...]",
     )
-    with pytest.raises(gasbuddy.exceptions.LibraryError):
-        manager = gasbuddy.GasBuddy()
+    with pytest.raises(py_gasbuddy.exceptions.LibraryError):
+        manager = py_gasbuddy.GasBuddy()
         data = await manager.price_lookup_service(lat=1234, lon=5678)
 
     mock_aioclient.post(
@@ -250,8 +250,8 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         status=200,
         body=json.dumps({"errors": {"message": "Fake Error"}}),
     )
-    with pytest.raises(gasbuddy.exceptions.APIError):
-        data = await gasbuddy.GasBuddy().price_lookup_service(lat=1234, lon=5678)
+    with pytest.raises(py_gasbuddy.exceptions.APIError):
+        data = await py_gasbuddy.GasBuddy().price_lookup_service(lat=1234, lon=5678)
     await manager.clear_cache()
 
 
@@ -264,7 +264,7 @@ async def test_header_errors(mock_aioclient, caplog):
         body=load_fixture("station.json"),
         repeat=True,
     )
-    await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
     assert (
         "An error reteiving data from the server, code: 404\nmessage: Not Found"
         in caplog.text
@@ -275,7 +275,7 @@ async def test_header_errors(mock_aioclient, caplog):
         exception=ServerTimeoutError,
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy(station_id=205033)
+        manager = py_gasbuddy.GasBuddy(station_id=205033)
         await manager.price_lookup()
     assert (
         "Timeout wile getting CSRF tokens: https://www.gasbuddy.com/home" in caplog.text
@@ -286,8 +286,8 @@ async def test_header_errors(mock_aioclient, caplog):
         body="<html></html>",
     )
     with caplog.at_level(logging.DEBUG):
-        with pytest.raises(gasbuddy.LibraryError):
-            manager = gasbuddy.GasBuddy(station_id=205033)
+        with pytest.raises(py_gasbuddy.LibraryError):
+            manager = py_gasbuddy.GasBuddy(station_id=205033)
             await manager.price_lookup()
     assert "CSRF token not found." in caplog.text
     assert "Skipping request due to missing token." in caplog.text
@@ -309,8 +309,8 @@ async def test_retry_logic(mock_aioclient, caplog):
         repeat=True,
     )
     with caplog.at_level(logging.DEBUG):
-        with pytest.raises(gasbuddy.LibraryError):
-            manager = gasbuddy.GasBuddy(station_id=205033)
+        with pytest.raises(py_gasbuddy.LibraryError):
+            manager = py_gasbuddy.GasBuddy(station_id=205033)
             await manager.price_lookup()
     assert "Retrying request..." in caplog.text
     await manager.clear_cache()
@@ -335,7 +335,7 @@ async def test_solver(mock_aioclient, caplog):
         body=load_fixture("solver_response.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy(solver_url=SOLVER_URL)
+        manager = py_gasbuddy.GasBuddy(solver_url=SOLVER_URL)
         data = await manager.location_search(zipcode=12345)
 
     assert (
@@ -359,8 +359,8 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
         body=load_fixture("server_error.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        with pytest.raises(gasbuddy.APIError):
-            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+        with pytest.raises(py_gasbuddy.APIError):
+            await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
 
     assert (
         "An error occured attempting to retrieve the data: Published deal alerts not found"
@@ -373,8 +373,8 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
         body='{"errors": "error"}',
     )
     with caplog.at_level(logging.DEBUG):
-        with pytest.raises(gasbuddy.APIError):
-            await gasbuddy.GasBuddy(station_id=205033).price_lookup()
+        with pytest.raises(py_gasbuddy.APIError):
+            await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
 
     assert (
         "An error occured attempting to retrieve the data: Server side error occured."
@@ -387,8 +387,8 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
         body="Not Found",
     )
     with caplog.at_level(logging.DEBUG):
-        with pytest.raises(gasbuddy.LibraryError):
-            manager = gasbuddy.GasBuddy(station_id=205033)
+        with pytest.raises(py_gasbuddy.LibraryError):
+            manager = py_gasbuddy.GasBuddy(station_id=205033)
             await manager.price_lookup()
 
     assert (
@@ -411,7 +411,7 @@ async def test_clear_cache(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station.json"),
     )
-    manager = gasbuddy.GasBuddy(station_id=205033)
+    manager = py_gasbuddy.GasBuddy(station_id=205033)
     await manager.price_lookup()
     await manager.clear_cache()
 
@@ -419,7 +419,7 @@ async def test_clear_cache(mock_aioclient, caplog):
 async def test_cache_json_error(mock_aioclient, caplog):
     """Test JSON error in cache read."""
     # Setup invalid cache file
-    file_name = "gasbuddy/gasbuddy_cache"
+    file_name = "py_gasbuddy/gasbuddy_cache"
     async with aiofiles.open(file_name, mode="w") as file:
         await file.write("lajdhfo98423hrujrna;ldifuhp8h4r984h32ioufhahudfhi2h398rhudn")
 
@@ -435,7 +435,7 @@ async def test_cache_json_error(mock_aioclient, caplog):
         body=load_fixture("station.json"),
     )
     with caplog.at_level(logging.DEBUG):
-        manager = gasbuddy.GasBuddy(station_id=205033)
+        manager = py_gasbuddy.GasBuddy(station_id=205033)
         await manager.price_lookup()
         assert "Invalid JSON data" in caplog.text
     await manager.clear_cache()
@@ -454,8 +454,8 @@ async def test_read_no_file(mock_aioclient, caplog):
         status=200,
         body=load_fixture("station.json"),
     )
-    manager = gasbuddy.GasBuddy(station_id=205033)
+    manager = py_gasbuddy.GasBuddy(station_id=205033)
     with caplog.at_level(logging.DEBUG):
-        manager._cache_manager = gasbuddy.cache.GasBuddyCache()
+        manager._cache_manager = py_gasbuddy.cache.GasBuddyCache()
         data = await manager._cache_manager.read_cache()
         assert data == {}

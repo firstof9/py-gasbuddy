@@ -53,7 +53,7 @@ class GasBuddyCache:
         if check:
             size = await aiofiles.os.path.getsize(self._cache_file)
             _LOGGER.debug("Checking cache file size: %s", size)
-            return size > 30
+            return bool(size > 30)
         return False
 
     async def clear_cache(self) -> None:
