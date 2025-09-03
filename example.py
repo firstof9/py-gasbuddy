@@ -2,7 +2,7 @@
 # make sure to run pip install -f requirements_example.txt before running this
 
 import asyncio
-import gasbuddy
+import py_gasbuddy
 
 
 async def main():
@@ -17,7 +17,7 @@ async def main():
         zip_code = "90210"  # Example zip code - Beverly Hills, CA
 
         # Initialize the GasBuddy API client
-        gb = gasbuddy.GasBuddy()
+        gb = py_gasbuddy.GasBuddy()
 
         # Initialize the GasBuddy API client
         stations = await gb.location_search(zipcode=zip_code)
@@ -34,7 +34,7 @@ async def main():
         else:
             print(f"No stations found for zip code {zip_code}.")
 
-    except gasbuddy.MissingSearchData as e:
+    except py_gasbuddy.MissingSearchData as e:
         print(f"An error occurred: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")

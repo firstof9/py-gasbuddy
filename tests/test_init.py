@@ -419,7 +419,7 @@ async def test_clear_cache(mock_aioclient, caplog):
 async def test_cache_json_error(mock_aioclient, caplog):
     """Test JSON error in cache read."""
     # Setup invalid cache file
-    file_name = "gasbuddy/gasbuddy_cache"
+    file_name = "py_gasbuddy/gasbuddy_cache"
     async with aiofiles.open(file_name, mode="w") as file:
         await file.write("lajdhfo98423hrujrna;ldifuhp8h4r984h32ioufhahudfhi2h398rhudn")
 
