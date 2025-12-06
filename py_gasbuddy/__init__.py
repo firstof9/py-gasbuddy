@@ -16,6 +16,7 @@ from .consts import (
     BASE_URL,
     DEFAULT_HEADERS,
     GAS_PRICE_QUERY,
+    GB_HOME_URL,
     LOCATION_QUERY,
     LOCATION_QUERY_PRICES,
     TOKEN,
@@ -26,6 +27,7 @@ ERROR_TIMEOUT = "Timeout while updating"
 CSRF_TIMEOUT = "Timeout wile getting CSRF tokens"
 MAX_RETRIES = 5
 _LOGGER = logging.getLogger(__name__)
+CSRF_PATTERN = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
 
 
 class GasBuddy:
@@ -180,31 +182,7 @@ class GasBuddy:
         prices = response["data"]["station"]["prices"]
         for price in prices:
             index = price["fuelProduct"]
-            if price["cash"]:
-                data[index] = {
-                    "credit": price["credit"]["nickname"],
-                    "cash_price": (
-                        None
-                        if price.get("cash", {}).get("price", 0) == 0
-                        else price["cash"]["price"]
-                    ),
-                    "price": (
-                        None
-                        if price.get("credit", {}).get("price", 0) == 0
-                        else price["credit"]["price"]
-                    ),
-                    "last_updated": price["credit"]["postedTime"],
-                }
-            else:
-                data[index] = {
-                    "credit": price["credit"]["nickname"],
-                    "price": (
-                        None
-                        if price.get("credit", {}).get("price", 0) == 0
-                        else price["credit"]["price"]
-                    ),
-                    "last_updated": price["credit"]["postedTime"],
-                }
+            data[index] = self._format_price_node(price)
 
         _LOGGER.debug("final data: %s", data)
 
@@ -273,11 +251,9 @@ class GasBuddy:
     async def _parse_results(self, response: dict, limit: int) -> list:
         """Parse API results and return price data list."""
         result_list = []
-        for result in response["data"]["locationBySearchTerm"]["stations"]["results"]:
-            if limit <= 0:
-                break
-            limit -= 1
-            # parse the prices
+        results = response["data"]["locationBySearchTerm"]["stations"]["results"]
+
+        for result in results[:limit]:
             price_data = {}
             price_data["station_id"] = result["id"]
             price_data["unit_of_measure"] = result["priceUnit"]
@@ -287,31 +263,7 @@ class GasBuddy:
 
             for price in result["prices"]:
                 index = price["fuelProduct"]
-                if price["cash"]:
-                    price_data[index] = {
-                        "credit": price["credit"]["nickname"],
-                        "cash_price": (
-                            None
-                            if price.get("cash", {}).get("price", 0) == 0
-                            else price["cash"]["price"]
-                        ),
-                        "price": (
-                            None
-                            if price.get("credit", {}).get("price", 0) == 0
-                            else price["credit"]["price"]
-                        ),
-                        "last_updated": price["credit"]["postedTime"],
-                    }
-                else:
-                    price_data[index] = {
-                        "credit": price["credit"]["nickname"],
-                        "price": (
-                            None
-                            if price.get("credit", {}).get("price", 0) == 0
-                            else price["credit"]["price"]
-                        ),
-                        "last_updated": price["credit"]["postedTime"],
-                    }
+                price_data[index] = self._format_price_node(price)
             result_list.append(price_data)
         return result_list
 
@@ -328,9 +280,9 @@ class GasBuddy:
             ),
             "apollo-require-preflight": "true",
             "Origin": "https://www.gasbuddy.com",
-            "Referer": "https://www.gasbuddy.com/home",
+            "Referer": GB_HOME_URL,
         }
-        url = "https://www.gasbuddy.com/home"
+        url = GB_HOME_URL
         method = "get"
         json_data: Any = {}
 
@@ -381,8 +333,7 @@ class GasBuddy:
                     if self._solver:
                         message = json.loads(message)["solution"]["response"]
 
-                    pattern = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
-                    found = pattern.search(message)
+                    found = CSRF_PATTERN.search(message)
                     if found is not None:
                         data = {}
                         self._tag = found.group(2)
@@ -402,3 +353,20 @@ class GasBuddy:
         """Clear cache file."""
         if self._cache_manager:
             await self._cache_manager.clear_cache()
+
+    def _format_price_node(self, price_node: dict) -> dict:
+        """Format a single price node."""
+        # Use 'or {}' to handle cases where the key exists but the value is None
+        credit_data = price_node.get("credit") or {}
+        cash_data = price_node.get("cash") or {}
+
+        # Safe extraction helpers
+        credit_price = credit_data.get("price", 0)
+        cash_price = cash_data.get("price", 0)
+
+        return {
+            "credit": credit_data.get("nickname"),
+            "cash_price": None if cash_price == 0 else cash_price,
+            "price": None if credit_price == 0 else credit_price,
+            "last_updated": credit_data.get("postedTime"),
+        }

@@ -2,6 +2,7 @@
 
 # flake8: noqa
 BASE_URL = "https://www.gasbuddy.com/graphql"
+GB_HOME_URL = "https://www.gasbuddy.com/home"
 
 DEFAULT_HEADERS = {
     "Content-Type": "application/json",
@@ -11,7 +12,7 @@ DEFAULT_HEADERS = {
     "Priority": "u=0",
     "apollo-require-preflight": "true",
     "Origin": "https://www.gasbuddy.com",
-    "Referer": "https://www.gasbuddy.com/home",
+    "Referer": GB_HOME_URL,
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "

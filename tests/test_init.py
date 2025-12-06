@@ -124,7 +124,7 @@ async def test_price_lookup(mock_aioclient, caplog):
 
     assert data["station_id"] == "197274"
     assert data["regular_gas"]["price"] == 131.9
-    assert "cash_price" not in data["regular_gas"]
+    assert data["regular_gas"]["cash_price"] == None
     assert data["regular_gas"]["credit"] == "qjnw4hgzcn"
     assert data["regular_gas"]["last_updated"] == "2024-09-06T14:42:39.298Z"
     assert data["unit_of_measure"] == "cents_per_liter"
@@ -161,21 +161,25 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         "latitude": 33.465405037595,
         "longitude": -112.505053281784,
         "regular_gas": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 3.28,
             "last_updated": "2024-11-18T21:58:38.859Z",
         },
         "midgrade_gas": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 3.73,
             "last_updated": "2024-11-18T21:58:38.891Z",
         },
         "premium_gas": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 4,
             "last_updated": "2024-11-18T21:58:38.915Z",
         },
         "diesel": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 3.5,
             "last_updated": "2024-11-18T21:58:38.946Z",
@@ -206,21 +210,25 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         "latitude": 33.465405037595,
         "longitude": -112.505053281784,
         "regular_gas": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 3.28,
             "last_updated": "2024-11-18T21:58:38.859Z",
         },
         "midgrade_gas": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 3.73,
             "last_updated": "2024-11-18T21:58:38.891Z",
         },
         "premium_gas": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 4,
             "last_updated": "2024-11-18T21:58:38.915Z",
         },
         "diesel": {
+            "cash_price": None,
             "credit": "fred1129",
             "price": 3.5,
             "last_updated": "2024-11-18T21:58:38.946Z",

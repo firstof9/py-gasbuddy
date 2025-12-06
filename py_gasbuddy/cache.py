@@ -2,7 +2,7 @@
 
 import json
 import logging
-from os.path import dirname, exists, join, split
+from pathlib import Path
 from typing import Any
 
 import aiofiles
@@ -12,28 +12,29 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GasBuddyCache:
-    """Represent py-gasbuddy Cache manager."""
+    """Class for GasBuddy file cache."""
 
     def __init__(self, cache_file: str = "") -> None:
         """Initialize."""
         if not cache_file:
-            cache_file = join(dirname(__file__), "gasbuddy_cache")
-        self._cache_file = cache_file
-        self._directory, self._filename = split(cache_file)
+            # Use Path to get current file's directory
+            self._cache_file = Path(__file__).parent / "gasbuddy_cache"
+        else:
+            self._cache_file = Path(cache_file)
 
     async def write_cache(self, data: Any) -> None:
         """Write cache file."""
-        if self._directory != "" and not exists(self._directory):
-            _LOGGER.debug("Directory missing creating: %s", self._directory)
-            await aiofiles.os.makedirs(self._directory)
+        # Create parent directories if they don't exist
+        if not await aiofiles.os.path.exists(self._cache_file.parent):
+            await aiofiles.os.makedirs(self._cache_file.parent)
+
         async with aiofiles.open(self._cache_file, mode="wb") as file:
-            _LOGGER.debug("Writing file: %s", self._cache_file)
             await file.write(data)
 
     async def read_cache(self) -> Any:
         """Read cache file."""
-        _LOGGER.debug("Attempting to read file: %s", self._cache_file)
-        if exists(self._cache_file):
+        if await aiofiles.os.path.exists(self._cache_file):
+            _LOGGER.debug("Attempting to read file: %s", self._cache_file)
             async with aiofiles.open(self._cache_file, mode="r") as file:
                 _LOGGER.debug("Reading file: %s", self._cache_file)
                 value = await file.read()
