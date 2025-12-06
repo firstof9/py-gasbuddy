@@ -259,14 +259,15 @@ class GasBuddy:
             _LOGGER.debug("trend data: %s", trend_data)
         return value
 
-    async def _parse_trends(self, response: dict) -> dict | None:
+    async def _parse_trends(self, response: dict) -> list | None:
         """Parse API results and return trend dict."""
-        trend_data: dict[str, Any] = {}
-        if response["data"]["locationBySearchTerm"]["trends"][0]:
-            result = response["data"]["locationBySearchTerm"]["trends"][0]
-            trend_data["average_price"] = result["today"]
-            trend_data["lowest_price"] = result["todayLow"]
-            trend_data["area"] = result["areaName"]
+        trend_data: list = []
+        for trend in response["data"]["locationBySearchTerm"]["trends"]:
+            current_trend: dict[str, Any] = {}
+            current_trend["average_price"] = trend["today"]
+            current_trend["lowest_price"] = trend["todayLow"]
+            current_trend["area"] = trend["areaName"]
+            trend_data.append(current_trend)
         return trend_data
 
     async def _parse_results(self, response: dict, limit: int) -> list:

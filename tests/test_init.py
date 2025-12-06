@@ -124,7 +124,7 @@ async def test_price_lookup(mock_aioclient, caplog):
 
     assert data["station_id"] == "197274"
     assert data["regular_gas"]["price"] == 131.9
-    assert not "cash_price" in data["regular_gas"]
+    assert "cash_price" not in data["regular_gas"]
     assert data["regular_gas"]["credit"] == "qjnw4hgzcn"
     assert data["regular_gas"]["last_updated"] == "2024-09-06T14:42:39.298Z"
     assert data["unit_of_measure"] == "cents_per_liter"
@@ -182,12 +182,11 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         },
     }
     assert len(data["results"]) == 5
-    assert data["trend"] == {
-        "average_price": 3.33,
-        "lowest_price": 2.59,
-        "area": "Arizona",
-    }
-    assert len(data["trend"]) == 3
+    assert data["trend"] == [
+        {"average_price": 3.33, "lowest_price": 2.59, "area": "Arizona"},
+        {"average_price": 3.11, "lowest_price": 0, "area": "United States"},
+    ]
+    assert len(data["trend"]) == 2
     await manager.clear_cache()
 
     mock_aioclient.post(
@@ -228,12 +227,11 @@ async def test_price_lookup_service(mock_aioclient, caplog):
         },
     }
     assert len(data["results"]) == 5
-    assert data["trend"] == {
-        "average_price": 3.33,
-        "lowest_price": 2.59,
-        "area": "Arizona",
-    }
-    assert len(data["trend"]) == 3
+    assert data["trend"] == [
+        {"average_price": 3.33, "lowest_price": 2.59, "area": "Arizona"},
+        {"average_price": 3.11, "lowest_price": 0, "area": "United States"},
+    ]
+    assert len(data["trend"]) == 2
     await manager.clear_cache()
 
     mock_aioclient.post(
