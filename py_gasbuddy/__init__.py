@@ -270,7 +270,7 @@ class GasBuddy:
         return result_list
 
     @backoff.on_exception(
-        backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
+        backoff.expo, aiohttp.ClientError, max_tries=MAX_RETRIES
     )
     async def _get_headers(self) -> None:
         """Get required headers."""
