@@ -480,10 +480,7 @@ async def test_content_type_error(mock_aioclient, caplog):
 
     # Construct a real ContentTypeError to mimic aiohttp behavior
     req_info = RequestInfo(
-        url=URL(TEST_URL),
-        method="POST",
-        headers={},
-        real_url=URL(TEST_URL)
+        url=URL(TEST_URL), method="POST", headers={}, real_url=URL(TEST_URL)
     )
     exc = ContentTypeError(req_info, (), message="Invalid content type")
 
@@ -495,7 +492,7 @@ async def test_content_type_error(mock_aioclient, caplog):
         # processes. If it returns {"error": ...}, price_lookup_service raises LibraryError.
         # But here checking the low-level process_request response via the public method.
         res = await manager.process_request({})
-    
+
     assert res == {"error": exc}
     assert "Invalid content type" in caplog.text
 
@@ -540,12 +537,8 @@ async def test_malformed_price_node(mock_aioclient):
                 "longitude": 0,
                 "brands": [],
                 "prices": [
-                    {
-                        "fuelProduct": "regular_gas",
-                        "credit": None,
-                        "cash": {"price": 0}
-                    }
-                ]
+                    {"fuelProduct": "regular_gas", "credit": None, "cash": {"price": 0}}
+                ],
             }
         }
     }
@@ -569,10 +562,7 @@ async def test_cache_small_file(mock_aioclient, tmp_path, caplog):
     cache_file = cache_dir / "test_cache"
     cache_file.write_text("short_invalid_token")
 
-    manager = py_gasbuddy.GasBuddy(
-        station_id=123,
-        cache_file=str(cache_file)
-    )
+    manager = py_gasbuddy.GasBuddy(station_id=123, cache_file=str(cache_file))
 
     mock_aioclient.get(
         GB_URL,
@@ -580,11 +570,7 @@ async def test_cache_small_file(mock_aioclient, tmp_path, caplog):
         body=load_fixture("index.html"),
         repeat=True,
     )
-    mock_aioclient.post(
-        TEST_URL,
-        status=200,
-        body=load_fixture("station.json")
-    )
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("station.json"))
 
     with caplog.at_level(logging.DEBUG):
         await manager.price_lookup()
