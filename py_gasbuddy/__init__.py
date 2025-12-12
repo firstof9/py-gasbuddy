@@ -38,6 +38,7 @@ class GasBuddy:
         station_id: int | None = None,
         solver_url: str | None = None,
         cache_file: str = "",
+        timeout: int = 60000,
     ) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
@@ -47,6 +48,7 @@ class GasBuddy:
         self._cf_last: bool | None = None
         self._cache_file = cache_file
         self._cache_manager: GasBuddyCache | None = None
+        self._timeout = timeout
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -272,16 +274,6 @@ class GasBuddy:
     )
     async def _get_headers(self) -> None:
         """Get required headers."""
-        headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/137.0.0.0 Safari/537.36"
-            ),
-            "apollo-require-preflight": "true",
-            "Origin": "https://www.gasbuddy.com",
-            "Referer": GB_HOME_URL,
-        }
         url = GB_HOME_URL
         method = "get"
         json_data: Any = {}
@@ -305,7 +297,7 @@ class GasBuddy:
         if self._solver:
             json_data["cmd"] = "request.get"
             json_data["url"] = url
-            json_data["headers"] = headers
+            json_data["maxTimeout"] = self._timeout
             url = self._solver
             method = "post"
 
@@ -314,7 +306,7 @@ class GasBuddy:
 
         _LOGGER.debug("Token invalid, getting a new one...")
 
-        async with aiohttp.ClientSession(headers=headers) as session:
+        async with aiohttp.ClientSession() as session:
             http_method = getattr(session, method)
             _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:

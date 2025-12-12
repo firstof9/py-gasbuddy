@@ -4,7 +4,9 @@ import json
 import logging
 
 import pytest
-from aiohttp.client_exceptions import ServerTimeoutError
+from aiohttp import RequestInfo
+from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
+from yarl import URL
 
 import aiofiles
 import aiofiles.os
@@ -465,3 +467,113 @@ async def test_read_no_file(mock_aioclient, caplog):
         manager._cache_manager = py_gasbuddy.cache.GasBuddyCache()
         data = await manager._cache_manager.read_cache()
         assert data == {}
+
+
+async def test_content_type_error(mock_aioclient, caplog):
+    """Test ContentTypeError handling in process_request."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+
+    # Construct a real ContentTypeError to mimic aiohttp behavior
+    req_info = RequestInfo(
+        url=URL(TEST_URL), method="POST", headers={}, real_url=URL(TEST_URL)
+    )
+    exc = ContentTypeError(req_info, (), message="Invalid content type")
+
+    mock_aioclient.post(TEST_URL, exception=exc)
+
+    manager = py_gasbuddy.GasBuddy()
+    with caplog.at_level(logging.ERROR):
+        # We expect a return value containing the error, which price_lookup_service
+        # processes. If it returns {"error": ...}, price_lookup_service raises LibraryError.
+        # But here checking the low-level process_request response via the public method.
+        res = await manager.process_request({})
+
+    assert res == {"error": exc}
+    assert "Invalid content type" in caplog.text
+
+
+async def test_non_json_response_error(mock_aioclient, caplog):
+    """Test non-JSON response with error status (e.g. Gateway Timeout)."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+
+    # Return plain text with 504
+    mock_aioclient.post(TEST_URL, status=504, body="Gateway Timeout")
+
+    manager = py_gasbuddy.GasBuddy()
+    with caplog.at_level(logging.WARNING):
+        with pytest.raises(py_gasbuddy.LibraryError):
+            await manager.price_lookup_service(zipcode=12345)
+
+    assert "Non-JSON response: Gateway Timeout" in caplog.text
+    assert "An error reteiving data from the server, code: 504" in caplog.text
+
+
+async def test_malformed_price_node(mock_aioclient):
+    """Test price lookup with null/missing price fields."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+
+    malformed_data = {
+        "data": {
+            "station": {
+                "id": "123",
+                "priceUnit": "usd",
+                "currency": "USD",
+                "latitude": 0,
+                "longitude": 0,
+                "brands": [],
+                "prices": [
+                    {"fuelProduct": "regular_gas", "credit": None, "cash": {"price": 0}}
+                ],
+            }
+        }
+    }
+
+    mock_aioclient.post(TEST_URL, status=200, body=json.dumps(malformed_data))
+
+    manager = py_gasbuddy.GasBuddy(station_id=123)
+    data = await manager.price_lookup()
+
+    # Ensure robust handling (converts 0/None to None)
+    assert data["regular_gas"]["price"] is None
+    assert data["regular_gas"]["cash_price"] is None
+    assert data["regular_gas"]["credit"] is None
+
+
+async def test_cache_small_file(mock_aioclient, tmp_path, caplog):
+    """Test that a cache file smaller than validation size is ignored."""
+    # Create a small cache file (< 30 bytes)
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    cache_file = cache_dir / "test_cache"
+    cache_file.write_text("short_invalid_token")
+
+    manager = py_gasbuddy.GasBuddy(station_id=123, cache_file=str(cache_file))
+
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("station.json"))
+
+    with caplog.at_level(logging.DEBUG):
+        await manager.price_lookup()
+
+    assert "Checking cache file size: 19" in caplog.text
+    assert "No cache file found, creating..." in caplog.text
