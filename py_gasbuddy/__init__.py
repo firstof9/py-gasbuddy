@@ -269,9 +269,7 @@ class GasBuddy:
             result_list.append(price_data)
         return result_list
 
-    @backoff.on_exception(
-        backoff.expo, aiohttp.ClientError, max_tries=MAX_RETRIES
-    )
+    @backoff.on_exception(backoff.expo, aiohttp.ClientError, max_tries=MAX_RETRIES)
     async def _get_headers(self) -> None:
         """Get required headers."""
         url = GB_HOME_URL
