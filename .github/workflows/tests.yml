@@ -44,10 +44,9 @@ jobs:
           uv run --all-extras tox -e
           ${{ matrix.python-version == '3.13' && 'py313' || 'py314' }}
       - name: Upload coverage data
-        if: matrix.python-version == '3.14'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-data
+          name: coverage-data-${{ matrix.python-version }}
           path: "coverage.xml"
 
   coverage:
@@ -59,8 +58,10 @@ jobs:
       - name: Download coverage data
         uses: actions/download-artifact@v4
         with:
-          name: coverage-data
+          pattern: coverage-data-*
+          merge-multiple: true
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: "coverage.xml"
