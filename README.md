@@ -6,4 +6,3 @@
 Python Library for GasBuddy GraphQL
 
 A python library for retreiving data from GasBuddy
-
