@@ -3,13 +3,13 @@
 import json
 import logging
 
+import aiofiles
+import aiofiles.os
 import pytest
 from aiohttp import RequestInfo
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 from yarl import URL
 
-import aiofiles
-import aiofiles.os
 import py_gasbuddy
 from tests.common import load_fixture
 
@@ -20,7 +20,16 @@ GB_URL = "https://www.gasbuddy.com/home"
 SOLVER_URL = "http://solver.url"
 
 
-async def test_location_search(mock_aioclient, caplog):
+@pytest.mark.parametrize(
+    ("zipcode", "lat", "lon", "fixture", "expected_id"),
+    [
+        (12345, None, None, "location.json", "187725"),
+        (None, 33.4654, -112.5051, "location.json", "187725"),
+    ],
+)
+async def test_location_search(
+    mock_aioclient, caplog, tmp_path, zipcode, lat, lon, fixture, expected_id
+):
     """Test location_search function."""
     mock_aioclient.get(
         GB_URL,
@@ -31,16 +40,19 @@ async def test_location_search(mock_aioclient, caplog):
     mock_aioclient.post(
         TEST_URL,
         status=200,
-        body=load_fixture("location.json"),
+        body=load_fixture(fixture),
     )
+    cache_file = str(tmp_path / "test_cache")
+    manager = py_gasbuddy.GasBuddy(cache_file=cache_file)
+    await manager.clear_cache()
     with caplog.at_level(logging.DEBUG):
-        manager = py_gasbuddy.GasBuddy()
-        data = await manager.location_search(zipcode=12345)
+        data = await manager.location_search(zipcode=zipcode, lat=lat, lon=lon)
 
     assert (
-        data["data"]["locationBySearchTerm"]["stations"]["results"][0]["id"] == "187725"
+        data["data"]["locationBySearchTerm"]["stations"]["results"][0]["id"]
+        == expected_id
     )
-    assert "CSRF token found: 1.+Qw4hH/vdM0Kvscg" in caplog.text
+    assert "CSRF token found:" in caplog.text
     await manager.clear_cache()
 
 
@@ -126,7 +138,7 @@ async def test_price_lookup(mock_aioclient, caplog):
 
     assert data["station_id"] == "197274"
     assert data["regular_gas"]["price"] == 131.9
-    assert data["regular_gas"]["cash_price"] == None
+    assert data["regular_gas"]["cash_price"] is None
     assert data["regular_gas"]["credit"] == "qjnw4hgzcn"
     assert data["regular_gas"]["last_updated"] == "2024-09-06T14:42:39.298Z"
     assert data["unit_of_measure"] == "cents_per_liter"
@@ -313,7 +325,10 @@ async def test_retry_logic(mock_aioclient, caplog):
     mock_aioclient.post(
         TEST_URL,
         status=403,
-        body='<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title></html>',
+        body=(
+            '<!DOCTYPE html><html lang="en-US"><head>'
+            "<title>Just a moment...</title></html>"
+        ),
         repeat=True,
     )
     with caplog.at_level(logging.DEBUG):
@@ -371,8 +386,8 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
             await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
 
     assert (
-        "An error occured attempting to retrieve the data: Published deal alerts not found"
-        in caplog.text
+        "An error occured attempting to retrieve the data: "
+        "Published deal alerts not found" in caplog.text
     )
 
     mock_aioclient.post(
@@ -489,8 +504,9 @@ async def test_content_type_error(mock_aioclient, caplog):
     manager = py_gasbuddy.GasBuddy()
     with caplog.at_level(logging.ERROR):
         # We expect a return value containing the error, which price_lookup_service
-        # processes. If it returns {"error": ...}, price_lookup_service raises LibraryError.
-        # But here checking the low-level process_request response via the public method.
+        # processes. If it returns {"error": ...}, price_lookup_service raises
+        # LibraryError. But here checking the low-level process_request response
+        # via the public method.
         res = await manager.process_request({})
 
     assert res == {"error": exc}

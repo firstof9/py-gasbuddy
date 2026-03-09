@@ -101,3 +101,4 @@ virtualization/vagrant/config
 .mypy_cache
 *.pyc
 gasbuddy/gasbuddy_cache
+py_gasbuddy/gasbuddy_cache
