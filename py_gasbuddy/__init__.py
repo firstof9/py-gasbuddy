@@ -43,7 +43,21 @@ class GasBuddy:
         timeout: int = 60000,
         session: aiohttp.ClientSession | None = None,
     ) -> None:
-        """Connect and request data from GasBuddy."""
+        """Initialize GasBuddy and connect to the GasBuddy API.
+
+        Args:
+            station_id: GasBuddy station ID for price lookups.
+            solver_url: Optional Cloudflare solver URL.
+            cache_file: Path to the CSRF-token cache file.
+            timeout: Request timeout in milliseconds.
+            session: An optional, caller-owned ``aiohttp.ClientSession``.
+                When provided, GasBuddy will reuse this session for all HTTP
+                requests and will **not** close or otherwise manage its
+                lifecycle; the caller is responsible for closing it.
+                When omitted, an ephemeral session is created and closed
+                automatically for each request.  See :meth:`_get_session`
+                for full lifecycle details.
+        """
         self._url = BASE_URL
         self._id = station_id
         self._solver = solver_url
