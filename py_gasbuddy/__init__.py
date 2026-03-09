@@ -6,6 +6,7 @@ import json
 import logging
 import re
 from collections.abc import Collection
+from contextlib import asynccontextmanager
 from typing import Any
 
 import aiohttp
@@ -40,8 +41,23 @@ class GasBuddy:
         solver_url: str | None = None,
         cache_file: str = "",
         timeout: int = 60000,
+        session: aiohttp.ClientSession | None = None,
     ) -> None:
-        """Connect and request data from GasBuddy."""
+        """Initialize GasBuddy and connect to the GasBuddy API.
+
+        Args:
+            station_id: GasBuddy station ID for price lookups.
+            solver_url: Optional Cloudflare solver URL.
+            cache_file: Path to the CSRF-token cache file.
+            timeout: Request timeout in milliseconds.
+            session: An optional, caller-owned ``aiohttp.ClientSession``.
+                When provided, GasBuddy will reuse this session for all HTTP
+                requests and will **not** close or otherwise manage its
+                lifecycle; the caller is responsible for closing it.
+                When omitted, an ephemeral session is created and closed
+                automatically for each request.  See :meth:`_get_session`
+                for full lifecycle details.
+        """
         self._url = BASE_URL
         self._id = station_id
         self._solver = solver_url
@@ -50,6 +66,7 @@ class GasBuddy:
         self._cache_file = cache_file
         self._cache_manager: GasBuddyCache | None = None
         self._timeout = timeout
+        self._session = session
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -58,7 +75,7 @@ class GasBuddy:
         self, query: dict[str, Collection[str]]
     ) -> dict[str, Any]:
         """Process API requests."""
-        headers = DEFAULT_HEADERS
+        headers = dict(DEFAULT_HEADERS)
         try:
             await self._get_headers()
         except CSRFTokenMissing:
@@ -67,11 +84,11 @@ class GasBuddy:
 
         headers["gbcsrf"] = self._tag
 
-        async with aiohttp.ClientSession(headers=headers) as session:
+        async with self._get_session() as session:
             json_query: str = json.dumps(query)
             _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
             try:
-                async with session.post(self._url, data=json_query) as response:
+                async with session.post(self._url, data=json_query, headers=headers) as response:  # noqa: E501
                     message: dict[str, Any] | Any = {}
                     try:
                         message = await response.text()
@@ -107,8 +124,25 @@ class GasBuddy:
                 _LOGGER.error("%s", err)
                 message = {"error": err}
 
-            await session.close()
-            return message
+        return message
+
+    @asynccontextmanager
+    async def _get_session(self):
+        """Yield the active HTTP session, managing its lifecycle.
+
+        Yields the injected session unchanged when one was provided at
+        construction time (the caller retains ownership and the session is not
+        closed here). Otherwise creates an ephemeral session with default
+        headers and closes it on exit.
+        """
+        if self._session is not None:
+            yield self._session
+        else:
+            session = aiohttp.ClientSession(headers=DEFAULT_HEADERS)
+            try:
+                yield session
+            finally:
+                await session.close()
 
     async def location_search(
         self,
@@ -306,11 +340,11 @@ class GasBuddy:
 
         _LOGGER.debug("Token invalid, getting a new one...")
 
-        async with aiohttp.ClientSession() as session:
+        async with self._get_session() as session:
             http_method = getattr(session, method)
             _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:
-                async with http_method(url, json=json_data) as response:
+                async with http_method(url, json=json_data, headers=DEFAULT_HEADERS) as response:  # noqa: E501
                     message: str = ""
                     message = await response.text()
                     if response.status != 200:
@@ -339,7 +373,6 @@ class GasBuddy:
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", CSRF_TIMEOUT, url)
-            await session.close()
 
     async def clear_cache(self) -> None:
         """Clear cache file."""
