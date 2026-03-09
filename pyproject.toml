@@ -27,6 +27,18 @@ dependencies = [
     "requests",
 ]
 
+[project.optional-dependencies]
+test = [
+    "aioresponses",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-timeout",
+    "requests-mock",
+    "tox",
+]
+
 [project.urls]
 Homepage = "https://github.com/firstof9/py-gasbuddy"
 Download = "https://github.com/firstof9/py-gasbuddy"

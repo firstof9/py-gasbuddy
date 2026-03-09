@@ -40,7 +40,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
       - name: Test with tox
-        run: uv run tox
+        run: uv run --all-extras tox
       - name: Upload coverage data
         if: matrix.python-version == '3.14'
         uses: actions/upload-artifact@v4
