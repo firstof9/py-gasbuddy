@@ -5,6 +5,7 @@ import logging
 
 import aiofiles
 import aiofiles.os
+import aiohttp
 import pytest
 from aiohttp import RequestInfo
 from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
@@ -568,6 +569,35 @@ async def test_malformed_price_node(mock_aioclient):
     assert data["regular_gas"]["price"] is None
     assert data["regular_gas"]["cash_price"] is None
     assert data["regular_gas"]["credit"] is None
+
+
+async def test_external_session(mock_aioclient, caplog, tmp_path):
+    """Test that an externally-provided session is reused and not closed."""
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+        repeat=True,
+    )
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=load_fixture("station.json"),
+        repeat=True,
+    )
+    cache_file = str(tmp_path / "test_cache")
+
+    async with aiohttp.ClientSession() as external_session:
+        manager = py_gasbuddy.GasBuddy(
+            station_id=205033, cache_file=cache_file, session=external_session
+        )
+        data = await manager.price_lookup()
+
+        # Session must still be open (not closed by the library)
+        assert not external_session.closed
+        assert data["station_id"] == "205033"
+
+    await manager.clear_cache()
 
 
 async def test_cache_small_file(mock_aioclient, tmp_path, caplog):

@@ -6,6 +6,7 @@ import json
 import logging
 import re
 from collections.abc import Collection
+from contextlib import asynccontextmanager
 from typing import Any
 
 import aiohttp
@@ -40,6 +41,7 @@ class GasBuddy:
         solver_url: str | None = None,
         cache_file: str = "",
         timeout: int = 60000,
+        session: aiohttp.ClientSession | None = None,
     ) -> None:
         """Connect and request data from GasBuddy."""
         self._url = BASE_URL
@@ -50,6 +52,7 @@ class GasBuddy:
         self._cache_file = cache_file
         self._cache_manager: GasBuddyCache | None = None
         self._timeout = timeout
+        self._session = session
 
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
@@ -67,7 +70,7 @@ class GasBuddy:
 
         headers["gbcsrf"] = self._tag
 
-        async with aiohttp.ClientSession(headers=headers) as session:
+        async with self._get_session(headers) as session:
             json_query: str = json.dumps(query)
             _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
             try:
@@ -107,8 +110,29 @@ class GasBuddy:
                 _LOGGER.error("%s", err)
                 message = {"error": err}
 
-            await session.close()
-            return message
+        return message
+
+    @asynccontextmanager
+    async def _get_session(
+        self, headers: dict[str, str] | None = None
+    ):
+        """Yield the active HTTP session, managing its lifecycle.
+
+        Yields the injected session unchanged when one was provided at
+        construction time (the caller retains ownership and the session is not
+        closed here). Otherwise creates an ephemeral session and closes it on
+        exit.
+        """
+        if self._session is not None:
+            if headers:
+                self._session.headers.update(headers)
+            yield self._session
+        else:
+            session = aiohttp.ClientSession(headers=headers)
+            try:
+                yield session
+            finally:
+                await session.close()
 
     async def location_search(
         self,
@@ -306,7 +330,7 @@ class GasBuddy:
 
         _LOGGER.debug("Token invalid, getting a new one...")
 
-        async with aiohttp.ClientSession() as session:
+        async with self._get_session() as session:
             http_method = getattr(session, method)
             _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:
@@ -339,7 +363,6 @@ class GasBuddy:
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", CSRF_TIMEOUT, url)
-            await session.close()
 
     async def clear_cache(self) -> None:
         """Clear cache file."""
