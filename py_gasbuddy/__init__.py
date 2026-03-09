@@ -70,11 +70,11 @@ class GasBuddy:
 
         headers["gbcsrf"] = self._tag
 
-        async with self._get_session(headers) as session:
+        async with self._get_session() as session:
             json_query: str = json.dumps(query)
             _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
             try:
-                async with session.post(self._url, data=json_query) as response:
+                async with session.post(self._url, data=json_query, headers=headers) as response:  # noqa: E501
                     message: dict[str, Any] | Any = {}
                     try:
                         message = await response.text()
@@ -113,22 +113,18 @@ class GasBuddy:
         return message
 
     @asynccontextmanager
-    async def _get_session(
-        self, headers: dict[str, str] | None = None
-    ):
+    async def _get_session(self):
         """Yield the active HTTP session, managing its lifecycle.
 
         Yields the injected session unchanged when one was provided at
         construction time (the caller retains ownership and the session is not
-        closed here). Otherwise creates an ephemeral session and closes it on
-        exit.
+        closed here). Otherwise creates an ephemeral session with default
+        headers and closes it on exit.
         """
         if self._session is not None:
-            if headers:
-                self._session.headers.update(headers)
             yield self._session
         else:
-            session = aiohttp.ClientSession(headers=headers)
+            session = aiohttp.ClientSession(headers=DEFAULT_HEADERS)
             try:
                 yield session
             finally:

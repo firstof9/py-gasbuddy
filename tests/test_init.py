@@ -571,8 +571,10 @@ async def test_malformed_price_node(mock_aioclient):
     assert data["regular_gas"]["credit"] is None
 
 
-async def test_external_session(mock_aioclient, caplog, tmp_path):
+async def test_external_session(mock_aioclient, tmp_path):
     """Test that an externally-provided session is reused and not closed."""
+    from unittest.mock import patch
+
     mock_aioclient.get(
         GB_URL,
         status=200,
@@ -588,10 +590,21 @@ async def test_external_session(mock_aioclient, caplog, tmp_path):
     cache_file = str(tmp_path / "test_cache")
 
     async with aiohttp.ClientSession() as external_session:
-        manager = py_gasbuddy.GasBuddy(
-            station_id=205033, cache_file=cache_file, session=external_session
-        )
-        data = await manager.price_lookup()
+        original_post = external_session.post
+        with patch.object(
+            external_session, "post", wraps=original_post
+        ) as mock_post:
+            manager = py_gasbuddy.GasBuddy(
+                station_id=205033, cache_file=cache_file, session=external_session
+            )
+            data = await manager.price_lookup()
+
+            # Confirm the injected session's post() was actually invoked
+            mock_post.assert_called_once_with(
+                py_gasbuddy.BASE_URL,
+                data=mock_post.call_args.kwargs["data"],
+                headers=mock_post.call_args.kwargs["headers"],
+            )
 
         # Session must still be open (not closed by the library)
         assert not external_session.closed
