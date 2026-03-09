@@ -27,7 +27,7 @@ SOLVER_URL = "http://solver.url"
     ],
 )
 async def test_location_search(
-    mock_aioclient, caplog, zipcode, lat, lon, fixture, expected_id
+    mock_aioclient, caplog, tmp_path, zipcode, lat, lon, fixture, expected_id
 ):
     """Test location_search function."""
     mock_aioclient.get(
@@ -41,7 +41,8 @@ async def test_location_search(
         status=200,
         body=load_fixture(fixture),
     )
-    manager = py_gasbuddy.GasBuddy()
+    cache_file = str(tmp_path / "test_cache")
+    manager = py_gasbuddy.GasBuddy(cache_file=cache_file)
     await manager.clear_cache()
     with caplog.at_level(logging.DEBUG):
         data = await manager.location_search(zipcode=zipcode, lat=lat, lon=lon)

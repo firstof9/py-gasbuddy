@@ -59,5 +59,5 @@ class GasBuddyCache:
 
     async def clear_cache(self) -> None:
         """Remove cache file."""
-        if await self.cache_exists():
+        if await aiofiles.os.path.exists(self._cache_file):
             await aiofiles.os.remove(self._cache_file)
