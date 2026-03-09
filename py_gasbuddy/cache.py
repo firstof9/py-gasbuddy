@@ -35,7 +35,7 @@ class GasBuddyCache:
         """Read cache file."""
         if await aiofiles.os.path.exists(self._cache_file):
             _LOGGER.debug("Attempting to read file: %s", self._cache_file)
-            async with aiofiles.open(self._cache_file, mode="r") as file:
+            async with aiofiles.open(self._cache_file) as file:
                 _LOGGER.debug("Reading file: %s", self._cache_file)
                 value = await file.read()
 

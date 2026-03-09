@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 import logging
 import re
-from typing import Any, Collection
+from collections.abc import Collection
+from typing import Any
 
 import aiohttp
-from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 import backoff
+from aiohttp.client_exceptions import ContentTypeError, ServerTimeoutError
 
 from .cache import GasBuddyCache
 from .consts import (
@@ -276,10 +277,11 @@ class GasBuddy:
         method = "get"
         json_data: Any = {}
 
-        if self._cache_file and self._cache_manager is None:
-            self._cache_manager = GasBuddyCache(self._cache_file)
-        else:
-            self._cache_manager = GasBuddyCache()
+        if self._cache_manager is None:
+            if self._cache_file:
+                self._cache_manager = GasBuddyCache(self._cache_file)
+            else:
+                self._cache_manager = GasBuddyCache()
 
         if await self._cache_manager.cache_exists():
             _LOGGER.debug("Found cache file, reading...")
@@ -341,8 +343,12 @@ class GasBuddy:
 
     async def clear_cache(self) -> None:
         """Clear cache file."""
-        if self._cache_manager:
-            await self._cache_manager.clear_cache()
+        if self._cache_manager is None:
+            if self._cache_file:
+                self._cache_manager = GasBuddyCache(self._cache_file)
+            else:
+                self._cache_manager = GasBuddyCache()
+        await self._cache_manager.clear_cache()
 
     def _format_price_node(self, price_node: dict) -> dict:
         """Format a single price node."""
