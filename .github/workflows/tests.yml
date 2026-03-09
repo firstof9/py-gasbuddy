@@ -17,7 +17,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          version: "latest"
+          version: "0.10.9"
       - name: Set up Python
         run: uv python install 3.14
       - name: Run pre-commit
@@ -36,11 +36,13 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          version: "latest"
+          version: "0.10.9"
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
       - name: Test with tox
-        run: uv run --all-extras tox
+        run: >-
+          uv run --all-extras tox -e
+          ${{ matrix.python-version == '3.13' && 'py313' || 'py314' }}
       - name: Upload coverage data
         if: matrix.python-version == '3.14'
         uses: actions/upload-artifact@v4

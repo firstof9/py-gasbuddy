@@ -24,6 +24,7 @@ SOLVER_URL = "http://solver.url"
     ("zipcode", "lat", "lon", "fixture", "expected_id"),
     [
         (12345, None, None, "location.json", "187725"),
+        (None, 33.4654, -112.5051, "location.json", "187725"),
     ],
 )
 async def test_location_search(

@@ -1,5 +1,5 @@
 -r requirements.txt
-ruff
+ruff==0.15.5
 pre-commit
 black==26.3.0
 flake8==7.3.0

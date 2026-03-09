@@ -81,7 +81,7 @@ convention = "google"
 "tests/*" = ["S101", "D101", "D102", "D103"]
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.13"
 platform = "linux"
 show_error_codes = true
 follow_imports = "normal"
