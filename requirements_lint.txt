@@ -3,7 +3,7 @@ ruff==0.15.10
 pre-commit==4.5.1
 black==26.3.1
 flake8==7.3.0
-mypy==1.20.0
+mypy==1.20.1
 pydocstyle==6.3.0
 isort
 pylint==4.0.5
