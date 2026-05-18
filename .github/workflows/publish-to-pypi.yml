@@ -5,21 +5,43 @@ on:
   release:
     types: [published, prereleased]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-publish:
     name: Builds and publishes releases to PyPI
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      # Harden the runner used by this workflow
+      - name: Harden Runner
+        uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
+        with:
+          egress-policy: audit
+
+      # Checkout with full git history so setuptools-scm can compute the version dynamically from tags
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
         with:
           enable-cache: true
+
       - name: Set up Python
         run: uv python install 3.14
+
       - name: Build package
         run: uv build
+
       - name: Publish release to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@7f25271a4aa483500f742f9492b2ab5648d61011 # v1.12.4
