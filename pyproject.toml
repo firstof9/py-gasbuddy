@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "py_gasbuddy"
-version = "0.4.3"
+dynamic = ["version"]
 description = "Python wrapper for GasBuddy GraphQL API"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -117,3 +117,6 @@ exclude_lines = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
 ]
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0.dev0"
