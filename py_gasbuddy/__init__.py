@@ -229,6 +229,12 @@ class GasBuddy:
                 response["error"],
             )
             return cast(LocationSearchResult, {"results": [], "next_cursor": None})
+        if "errors" in response:
+            _LOGGER.error(
+                "location_search: GraphQL errors returned: %s",
+                response["errors"],
+            )
+            return cast(LocationSearchResult, {"results": [], "next_cursor": None})
         return parse_location_results(response)
 
     async def price_lookup(self) -> StationPrice:
@@ -264,7 +270,10 @@ class GasBuddy:
             )
             raise APIError
 
-        station = response["data"]["station"]
+        station = response.get("data", {}).get("station")
+        if not station:
+            _LOGGER.error("price_lookup: station payload missing or null in response")
+            raise APIError
         raw: dict[str, Any] = {
             "station_id": station["id"],
             "name": station.get("name") or "",

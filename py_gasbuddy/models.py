@@ -103,6 +103,7 @@ class StationPrice(TypedDict, total=False):
     latitude: Required[float]
     longitude: Required[float]
     image_url: Required[str | None]
+    distance: float | None
     address: Address
     brands: list[Brand]
     amenities: list[Amenity]

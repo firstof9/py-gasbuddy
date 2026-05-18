@@ -55,7 +55,7 @@ def format_price_node(
     effective_price = None if credit_price == 0 else credit_price
     deal_price: float | None = None
     if effective_price is not None and deal_discount is not None:
-        deal_price = round(effective_price - deal_discount, 2)
+        deal_price = round(max(effective_price - deal_discount, 0.0), 2)
 
     return PriceNode(
         credit=credit_data.get("nickname"),
@@ -112,8 +112,8 @@ def parse_results(response: dict[str, Any], limit: int) -> list[StationPrice]:
             "currency": result["currency"],
             "latitude": result["latitude"],
             "longitude": result["longitude"],
-            "image_url": result["brands"][0]["imageUrl"]
-            if result.get("brands")
+            "image_url": result["brands"][0].get("imageUrl")
+            if isinstance(result.get("brands"), list) and result["brands"]
             else None,
             "address": result.get("address") or {},
             "brands": result.get("brands") or [],

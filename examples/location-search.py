@@ -5,6 +5,7 @@ import asyncio
 import logging
 
 from py_gasbuddy import GasBuddy, MissingSearchData
+from py_gasbuddy.exceptions import APIError, LibraryError
 
 
 def parse_args() -> argparse.Namespace:
@@ -65,6 +66,8 @@ async def main() -> None:
                 )
         except MissingSearchData:
             raise SystemExit("No search parameters provided.")
+        except (LibraryError, APIError) as e:
+            raise SystemExit(f"Error fetching stations: {e}")
 
         all_stations.extend(result["results"])
         cursor = result.get("next_cursor")

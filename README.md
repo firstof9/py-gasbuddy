@@ -125,27 +125,32 @@ for amenity in data["amenities"]:
 
 ---
 
-### `location_search(lat, lon, zipcode, brand_id, fuel) → list[StationSummary]`
+### `location_search(lat, lon, zipcode, brand_id, fuel, cursor) → LocationSearchResult`
 
-Returns a list of nearby stations (no prices). Pass either `lat`+`lon` or `zipcode`.
+Returns a dict with `results` (list of `StationSummary`) and optionally `next_cursor` for pagination. Pass either `lat`+`lon` or `zipcode`.
 
 ```python
 # By ZIP code
-stations = await GasBuddy().location_search(zipcode=85396)
+result = await GasBuddy().location_search(zipcode=85396)
 
 # By GPS coordinates
-stations = await GasBuddy().location_search(lat=33.465, lon=-112.505)
+result = await GasBuddy().location_search(lat=33.465, lon=-112.505)
 
 # Filter to diesel-only stations (fuel ID 4)
-stations = await GasBuddy().location_search(zipcode=85396, fuel=4)
+result = await GasBuddy().location_search(zipcode=85396, fuel=4)
 
 # Filter to a specific brand (38 = Costco)
-stations = await GasBuddy().location_search(zipcode=85396, brand_id=38)
+result = await GasBuddy().location_search(zipcode=85396, brand_id=38)
 
-for s in stations:
+for s in result["results"]:
     print(s["station_id"], s["name"], s["distance"])
     print(s["address"]["locality"], s["address"]["region"])
     print(s["fuels"])
+
+# Paginate
+cursor = result.get("next_cursor")
+if cursor:
+    page2 = await GasBuddy().location_search(zipcode=85396, cursor=cursor)
 ```
 
 **`StationSummary` fields:**
@@ -164,7 +169,7 @@ for s in stations:
 
 ---
 
-### `price_lookup_service(lat, lon, zipcode, limit, brand_id, fuel) → PriceServiceResult`
+### `price_lookup_service(lat, lon, zipcode, limit, brand_id, fuel, cursor) → PriceServiceResult`
 
 Returns prices for nearby stations plus regional trend data. Pass either `lat`+`lon` or `zipcode`. `limit` defaults to 5.
 
@@ -179,7 +184,12 @@ for station in result["results"]:
 
 # Regional trends
 for trend in result.get("trend", []):
-    print(trend["area"], trend["average_price"], trend["today_low"])
+    print(trend["area"], trend["average_price"], trend["lowest_price"])
+
+# Paginate
+cursor = result.get("next_cursor")
+if cursor:
+    page2 = await GasBuddy().price_lookup_service(zipcode=85396, cursor=cursor)
 ```
 
 Results have the same structure as `StationPrice` (see `price_lookup` above) minus station-only fields like `amenities`, `hours`, `offers`, and `pay_status`.
@@ -269,3 +279,4 @@ See the [`examples/`](examples/) directory for runnable scripts:
 | `price-lookup.py` | Full station detail by station ID |
 | `price-lookup-service.py` | Nearby prices + trends by ZIP or GPS |
 | `location-search.py` | Station list (no prices) by ZIP or GPS |
+| `ev-chargers.py` | EV charger locations and status (CLI) |
