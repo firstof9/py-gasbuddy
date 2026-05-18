@@ -86,6 +86,23 @@ async def test_location_search_exception(mock_aioclient):
         await manager.clear_cache()
 
 
+async def test_location_search_graphql_errors(mock_aioclient, caplog):
+    """Test location_search returns empty result when response has GraphQL errors."""
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=json.dumps({"errors": [{"message": "Some GraphQL error"}]}),
+    )
+    with caplog.at_level(logging.ERROR):
+        manager = py_gasbuddy.GasBuddy()
+        result = await manager.location_search(zipcode=12345)
+    assert result["results"] == []
+    assert result["next_cursor"] is None
+    assert "location_search: GraphQL errors returned" in caplog.text
+    await manager.clear_cache()
+
+
 async def test_price_lookup(mock_aioclient, caplog):
     """Test price_lookup function."""
     mock_aioclient.get(
@@ -382,6 +399,20 @@ async def test_price_lookup_api_error(mock_aioclient, caplog):
         in caplog.text
     )
     await manager.clear_cache()
+
+
+async def test_price_lookup_null_station(mock_aioclient, caplog):
+    """Test price_lookup raises APIError when station payload is null/absent."""
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    mock_aioclient.post(
+        TEST_URL,
+        status=200,
+        body=json.dumps({"data": {"station": None}}),
+    )
+    with caplog.at_level(logging.ERROR):
+        with pytest.raises(py_gasbuddy.APIError):
+            await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    assert "station payload missing or null" in caplog.text
 
 
 async def test_clear_cache(mock_aioclient, caplog):
