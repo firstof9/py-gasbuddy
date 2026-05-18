@@ -17,8 +17,7 @@ class GasBuddyCache:
     def __init__(self, cache_file: str = "") -> None:
         """Initialize."""
         if not cache_file:
-            # Use Path to get current file's directory
-            self._cache_file = Path(__file__).parent / "gasbuddy_cache"
+            self._cache_file = Path.home() / ".cache" / "py_gasbuddy" / "token"
         else:
             self._cache_file = Path(cache_file)
 

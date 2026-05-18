@@ -1,18 +1,58 @@
 {
     "data": {
         "station": {
+            "id": "205033",
+            "name": "Wawa",
+            "phone": "610-555-0100",
+            "openStatus": "open",
+            "priceUnit": "dollars_per_gallon",
+            "currency": "USD",
+            "latitude": 40.196589,
+            "longitude": -75.47145,
+            "enterprise": false,
+            "fuels": ["regular_gas", "midgrade_gas", "premium_gas"],
+            "hasActiveOutage": false,
+            "isFuelmanSite": false,
+            "starRating": 4.2,
+            "ratingsCount": 38,
+            "address": {
+                "country": "US",
+                "line1": "123 Main St",
+                "line2": null,
+                "locality": "Phoenixville",
+                "postalCode": "19460",
+                "region": "PA"
+            },
             "brands": [],
+            "amenities": [
+                {"amenityId": 1, "imageUrl": "https://images.gasbuddy.io/amenities/atm.png", "name": "ATM"},
+                {"amenityId": 2, "imageUrl": "https://images.gasbuddy.io/amenities/restroom.png", "name": "Restrooms"}
+            ],
+            "hours": {
+                "openingHours": "24 Hours",
+                "status": "open",
+                "nextIntervals": [
+                    {"open": "00:00", "close": "23:59"}
+                ]
+            },
+            "emergencyStatus": {
+                "hasGas": {"nickname": null, "reportStatus": null, "updateDate": null, "stamp": null},
+                "hasPower": {"nickname": null, "reportStatus": null, "updateDate": null, "stamp": null},
+                "hasDiesel": {"nickname": null, "reportStatus": null, "updateDate": null, "stamp": null}
+            },
             "prices": [
                 {
                     "cash": {
                         "nickname": "Flemmit",
                         "postedTime": "2024-09-06T09:54:05.458Z",
-                        "price": 3.17
+                        "price": 3.17,
+                        "formattedPrice": "$3.17"
                     },
                     "credit": {
                         "nickname": "Flemmit",
                         "postedTime": "2024-09-06T09:54:05.489Z",
-                        "price": 3.27
+                        "price": 3.27,
+                        "formattedPrice": "$3.27"
                     },
                     "fuelProduct": "regular_gas",
                     "longName": "Regular"
@@ -21,12 +61,14 @@
                     "cash": {
                         "nickname": "Flemmit",
                         "postedTime": "2024-09-05T17:32:42.712Z",
-                        "price": 3.59
+                        "price": 3.59,
+                        "formattedPrice": "$3.59"
                     },
                     "credit": {
                         "nickname": "drwjd",
                         "postedTime": "2024-09-05T14:53:44.183Z",
-                        "price": 3.59
+                        "price": 3.59,
+                        "formattedPrice": "$3.59"
                     },
                     "fuelProduct": "midgrade_gas",
                     "longName": "Midgrade"
@@ -35,22 +77,34 @@
                     "cash": {
                         "nickname": null,
                         "postedTime": null,
-                        "price": 0
+                        "price": 0,
+                        "formattedPrice": null
                     },
                     "credit": {
                         "nickname": null,
                         "postedTime": null,
-                        "price": 0
+                        "price": 0,
+                        "formattedPrice": null
                     },
                     "fuelProduct": "premium_gas",
                     "longName": "Premium"
                 }
             ],
-            "priceUnit": "dollars_per_gallon",
-            "currency": "USD",
-            "id": "205033",
-            "latitude": 40.196589,
-            "longitude": -75.47145
+            "offers": [
+                {
+                    "discounts": [
+                        {"grades": ["regular_gas"], "highlight": "Flash Deal: Save 5¢ per gallon", "pwgbDiscount": "0.05", "receiptDiscount": null},
+                        {"grades": ["midgrade_gas"], "highlight": "Flash Deal: Save 8¢ per gallon", "pwgbDiscount": "0.08", "receiptDiscount": null}
+                    ],
+                    "highlight": "Flash Deal: Save up to 8¢ per gallon",
+                    "id": "offer_001",
+                    "types": ["gasbuddy"],
+                    "use": ["banner", "strike", "sort"]
+                }
+            ],
+            "payStatus": {
+                "isPayAvailable": true
+            }
         }
     }
 }

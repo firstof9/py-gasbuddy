@@ -6,11 +6,11 @@ class MissingSearchData(Exception):
 
 
 class LibraryError(Exception):
-    """Exception for missing search data variable."""
+    """Exception for a general library failure."""
 
 
 class APIError(Exception):
-    """Exception for missing search data variable."""
+    """Exception for a GraphQL API error returned by the server."""
 
 
 class CSRFTokenMissing(Exception):
