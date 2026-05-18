@@ -98,7 +98,7 @@ async def main() -> None:
         raise SystemExit(f"Error fetching EV stations: {e}")
 
     stations = result["stations"]
-    print(f"Found {result['total']} station(s) — showing {len(stations)}:\n")
+    print(f"Found {result['total']} station(s) - showing {len(stations)}:\n")
 
     for i, s in enumerate(stations, 1):
         dist = s.get("distance_miles")
