@@ -36,6 +36,7 @@ jobs:
         uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
         with:
           enable-cache: true
+          version: "0.10.9"
 
       - name: Set up Python
         run: uv python install 3.14
@@ -44,4 +45,4 @@ jobs:
         run: uv build
 
       - name: Publish release to PyPI
-        uses: pypa/gh-action-pypi-publish@7f25271a4aa483500f742f9492b2ab5648d61011 # v1.12.4
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
