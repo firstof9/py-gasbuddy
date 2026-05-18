@@ -1,148 +1,234 @@
 {
     "data": {
         "locationBySearchTerm": {
+            "countryCode": "US",
+            "displayName": "Buckeye, AZ",
+            "latitude": 33.465,
+            "longitude": -112.505,
+            "regionCode": "AZ",
             "stations": {
                 "count": 92,
+                "cursor": {"next": null},
                 "results": [
                     {
-                        "address": {
-                            "line1": "1520 N Verrado Way"
-                        },
+                        "address": {"country": "US", "line1": "1520 N Verrado Way", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
+                        "brands": [{"brandId": 23, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/23.png", "name": "Shell"}],
+                        "distance": 0.4,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "187725",
-                        "name": "Shell"
+                        "name": "Shell",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 21,
+                        "starRating": 4.1
                     },
                     {
-                        "address": {
-                            "line1": "1101 N Verrado Way"
-                        },
+                        "address": {"country": "US", "line1": "1101 N Verrado Way", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
+                        "brands": [{"brandId": 10, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/10.png", "name": "Costco"}],
+                        "distance": 0.7,
+                        "fuels": ["regular_gas", "premium_gas"],
                         "id": "208656",
-                        "name": "Costco"
+                        "name": "Costco",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 55,
+                        "starRating": 4.7
                     },
                     {
-                        "address": {
-                            "line1": "1419 N 195th Ave"
-                        },
+                        "address": {"country": "US", "line1": "1419 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
+                        "brands": [{"brandId": 5, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/5.png", "name": "Chevron"}],
+                        "distance": 1.1,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "87490",
-                        "name": "Chevron"
+                        "name": "Chevron",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 8,
+                        "starRating": 3.9
                     },
                     {
-                        "address": {
-                            "line1": "721 N 195th Ave"
-                        },
+                        "address": {"country": "US", "line1": "721 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
+                        "brands": [{"brandId": 8, "brandingType": "branded", "imageUrl": null, "name": "Circle K"}],
+                        "distance": 1.5,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "110402",
-                        "name": "Circle K"
+                        "name": "Circle K",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 15,
+                        "starRating": 3.5
                     },
                     {
-                        "address": {
-                            "line1": "19600 W Indian School Rd"
-                        },
+                        "address": {"country": "US", "line1": "19600 W Indian School Rd", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
+                        "brands": [{"brandId": 42, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/42.png", "name": "Fry's"}],
+                        "distance": 2.0,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel", "e85"],
                         "id": "203982",
-                        "name": "Fry's"
+                        "name": "Fry's",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 30,
+                        "starRating": 4.0
                     },
                     {
-                        "address": {
-                            "line1": "537 S Watson Rd"
-                        },
+                        "address": {"country": "US", "line1": "537 S Watson Rd", "line2": null, "locality": "Avondale", "postalCode": "85323", "region": "AZ"},
+                        "brands": [{"brandId": 8, "brandingType": "branded", "imageUrl": null, "name": "Circle K"}],
+                        "distance": 2.3,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "126744",
-                        "name": "Circle K"
+                        "name": "Circle K",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 10,
+                        "starRating": 3.8
                     },
                     {
-                        "address": {
-                            "line1": "900 S Watson Rd"
-                        },
+                        "address": {"country": "US", "line1": "900 S Watson Rd", "line2": null, "locality": "Avondale", "postalCode": "85323", "region": "AZ"},
+                        "brands": [{"brandId": 60, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/60.png", "name": "QuikTrip"}],
+                        "distance": 2.6,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "201250",
-                        "name": "QuikTrip"
+                        "name": "QuikTrip",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 44,
+                        "starRating": 4.5
                     },
                     {
-                        "address": {
-                            "line1": "1300 S Watson Rd"
-                        },
+                        "address": {"country": "US", "line1": "1300 S Watson Rd", "line2": null, "locality": "Avondale", "postalCode": "85323", "region": "AZ"},
+                        "brands": [{"brandId": 42, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/42.png", "name": "Fry's"}],
+                        "distance": 2.9,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "38363",
-                        "name": "Fry's"
+                        "name": "Fry's",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 18,
+                        "starRating": 4.2
                     },
                     {
-                        "address": {
-                            "line1": "1610 N Miller Rd"
-                        },
+                        "address": {"country": "US", "line1": "1610 N Miller Rd", "line2": null, "locality": "Buckeye", "postalCode": "85326", "region": "AZ"},
+                        "brands": [{"brandId": 55, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/55.png", "name": "Love's Travel Stop"}],
+                        "distance": 3.2,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "27487",
-                        "name": "Love's Travel Stop"
+                        "name": "Love's Travel Stop",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 62,
+                        "starRating": 4.3
                     },
                     {
-                        "address": {
-                            "line1": "1850 S Miller Rd"
-                        },
+                        "address": {"country": "US", "line1": "1850 S Miller Rd", "line2": null, "locality": "Buckeye", "postalCode": "85326", "region": "AZ"},
+                        "brands": [{"brandId": 60, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/60.png", "name": "QuikTrip"}],
+                        "distance": 3.5,
+                        "fuels": ["regular_gas", "premium_gas", "diesel"],
                         "id": "160044",
-                        "name": "QuikTrip"
+                        "name": "QuikTrip",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 37,
+                        "starRating": 4.6
                     },
                     {
-                        "address": {
-                            "line1": "2075 S Miller Rd"
-                        },
+                        "address": {"country": "US", "line1": "2075 S Miller Rd", "line2": null, "locality": "Buckeye", "postalCode": "85326", "region": "AZ"},
+                        "brands": [{"brandId": 5, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/5.png", "name": "Chevron"}],
+                        "distance": 3.8,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel", "e85"],
                         "id": "135437",
-                        "name": "Chevron"
+                        "name": "Chevron",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 9,
+                        "starRating": 3.7
                     },
                     {
-                        "address": {
-                            "line1": "16380 W Yuma Rd"
-                        },
+                        "address": {"country": "US", "line1": "16380 W Yuma Rd", "line2": null, "locality": "Goodyear", "postalCode": "85338", "region": "AZ"},
+                        "brands": [{"brandId": 42, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/42.png", "name": "Fry's"}],
+                        "distance": 4.1,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "130812",
-                        "name": "Fry's"
+                        "name": "Fry's",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 14,
+                        "starRating": 4.0
                     },
                     {
-                        "address": {
-                            "line1": "15535 W McDowell Rd"
-                        },
+                        "address": {"country": "US", "line1": "15535 W McDowell Rd", "line2": null, "locality": "Goodyear", "postalCode": "85395", "region": "AZ"},
+                        "brands": [{"brandId": 8, "brandingType": "branded", "imageUrl": null, "name": "Circle K"}],
+                        "distance": 4.4,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "200905",
-                        "name": "Circle K"
+                        "name": "Circle K",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 6,
+                        "starRating": 3.6
                     },
                     {
-                        "address": {
-                            "line1": "440 N Estrella Pkwy"
-                        },
+                        "address": {"country": "US", "line1": "440 N Estrella Pkwy", "line2": null, "locality": "Goodyear", "postalCode": "85338", "region": "AZ"},
+                        "brands": [{"brandId": 70, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/70.png", "name": "Safeway"}],
+                        "distance": 4.7,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas"],
                         "id": "85320",
-                        "name": "Safeway"
+                        "name": "Safeway",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 25,
+                        "starRating": 4.1
                     },
                     {
-                        "address": {
-                            "line1": "575 N Estrella Pkwy"
-                        },
+                        "address": {"country": "US", "line1": "575 N Estrella Pkwy", "line2": null, "locality": "Goodyear", "postalCode": "85338", "region": "AZ"},
+                        "brands": [{"brandId": 60, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/60.png", "name": "QuikTrip"}],
+                        "distance": 5.0,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "155795",
-                        "name": "QuikTrip"
+                        "name": "QuikTrip",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 48,
+                        "starRating": 4.5
                     },
                     {
-                        "address": {
-                            "line1": "307 E US-85"
-                        },
+                        "address": {"country": "US", "line1": "307 E US-85", "line2": null, "locality": "Goodyear", "postalCode": "85338", "region": "AZ"},
+                        "brands": [{"brandId": 8, "brandingType": "branded", "imageUrl": null, "name": "Circle K"}],
+                        "distance": 5.3,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas"],
                         "id": "118417",
-                        "name": "Circle K"
+                        "name": "Circle K",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 7,
+                        "starRating": 3.4
                     },
                     {
-                        "address": {
-                            "line1": "825 E Monroe Ave"
-                        },
+                        "address": {"country": "US", "line1": "825 E Monroe Ave", "line2": null, "locality": "Buckeye", "postalCode": "85326", "region": "AZ"},
+                        "brands": [{"brandId": 5, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/5.png", "name": "Chevron"}],
+                        "distance": 5.6,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "154238",
-                        "name": "Chevron"
+                        "name": "Chevron",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 11,
+                        "starRating": 3.9
                     },
                     {
-                        "address": {
-                            "line1": "501 E Monroe Ave"
-                        },
+                        "address": {"country": "US", "line1": "501 E Monroe Ave", "line2": null, "locality": "Buckeye", "postalCode": "85326", "region": "AZ"},
+                        "brands": [{"brandId": 23, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/23.png", "name": "Shell"}],
+                        "distance": 5.9,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "150938",
-                        "name": "Shell"
+                        "name": "Shell",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 19,
+                        "starRating": 4.0
                     },
                     {
-                        "address": {
-                            "line1": "1540 N Bullard Ave"
-                        },
+                        "address": {"country": "US", "line1": "1540 N Bullard Ave", "line2": null, "locality": "Goodyear", "postalCode": "85395", "region": "AZ"},
+                        "brands": [{"brandId": 60, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/60.png", "name": "QuikTrip"}],
+                        "distance": 6.2,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
                         "id": "209199",
-                        "name": "QuikTrip"
+                        "name": "QuikTrip",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 33,
+                        "starRating": 4.4
                     },
                     {
-                        "address": {
-                            "line1": "14175 W Indian School Rd"
-                        },
+                        "address": {"country": "US", "line1": "14175 W Indian School Rd", "line2": null, "locality": "Goodyear", "postalCode": "85395", "region": "AZ"},
+                        "brands": [{"brandId": 70, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/70.png", "name": "Safeway"}],
+                        "distance": 6.5,
+                        "fuels": ["regular_gas", "premium_gas"],
                         "id": "27442",
-                        "name": "Safeway"
+                        "name": "Safeway",
+                        "priceUnit": "dollars_per_gallon",
+                        "ratingsCount": 22,
+                        "starRating": 4.1
                     }
                 ]
             }

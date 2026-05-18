@@ -1,0 +1,72 @@
+{
+    "data": {
+        "evStationsNearby": {
+            "stations": [
+                {
+                    "id": "EV_001",
+                    "stationName": "Electrify America - Walmart",
+                    "streetAddress": "100 Main St",
+                    "city": "Camillus",
+                    "state": "NY",
+                    "zip": "13031",
+                    "latitude": 43.045,
+                    "longitude": -76.308,
+                    "distanceMiles": 0.5,
+                    "statusCode": "E",
+                    "evNetwork": "Electrify_America",
+                    "evNetworkWeb": "https://www.electrifyamerica.com",
+                    "evLevel1EvseNum": 0,
+                    "evLevel2EvseNum": 0,
+                    "evDcFastNum": 6,
+                    "evPricing": "$0.48/kWh",
+                    "evJ1772ConnectorCount": 0,
+                    "evJ1772PowerOutput": null,
+                    "evCcsConnectorCount": 6,
+                    "evCcsPowerOutput": "350kW",
+                    "evChademoConnectorCount": 0,
+                    "evChademoPowerOutput": null,
+                    "evJ3400ConnectorCount": 0,
+                    "evJ3400PowerOutput": null,
+                    "stationPhone": "1-833-632-2778",
+                    "accessDaysTime": "24 hours daily",
+                    "accessCode": "public",
+                    "cardsAccepted": "credit",
+                    "dateLastConfirmed": "2024-11-01"
+                },
+                {
+                    "id": "EV_002",
+                    "stationName": "ChargePoint - Wegmans",
+                    "streetAddress": "200 Erie Blvd W",
+                    "city": "Syracuse",
+                    "state": "NY",
+                    "zip": "13204",
+                    "latitude": 43.048,
+                    "longitude": -76.158,
+                    "distanceMiles": 8.2,
+                    "statusCode": "E",
+                    "evNetwork": "ChargePoint",
+                    "evNetworkWeb": "https://www.chargepoint.com",
+                    "evLevel1EvseNum": 0,
+                    "evLevel2EvseNum": 4,
+                    "evDcFastNum": 0,
+                    "evPricing": "$0.25/kWh",
+                    "evJ1772ConnectorCount": 4,
+                    "evJ1772PowerOutput": "7.2kW",
+                    "evCcsConnectorCount": 0,
+                    "evCcsPowerOutput": null,
+                    "evChademoConnectorCount": 0,
+                    "evChademoPowerOutput": null,
+                    "evJ3400ConnectorCount": 0,
+                    "evJ3400PowerOutput": null,
+                    "stationPhone": null,
+                    "accessDaysTime": "6AM-11PM",
+                    "accessCode": "public",
+                    "cardsAccepted": "credit card",
+                    "dateLastConfirmed": "2024-10-15"
+                }
+            ],
+            "total": 2,
+            "limit": 50
+        }
+    }
+}

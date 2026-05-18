@@ -1,21 +1,63 @@
 {
     "data": {
         "station": {
+            "id": "197274",
+            "name": "Esso",
+            "phone": null,
+            "openStatus": "open",
+            "priceUnit": "cents_per_liter",
+            "currency": "CAD",
+            "latitude": 53.3066,
+            "longitude": -113.5559,
+            "enterprise": false,
+            "fuels": ["regular_gas", "premium_gas"],
+            "hasActiveOutage": false,
+            "isFuelmanSite": false,
+            "starRating": 3.8,
+            "ratingsCount": 12,
+            "address": {
+                "country": "CA",
+                "line1": "456 Maple Ave",
+                "line2": null,
+                "locality": "Edmonton",
+                "postalCode": "T5A 0A1",
+                "region": "AB"
+            },
             "brands": [
                 {
-                    "imageUrl": "https://images.gasbuddy.io/b/117.png"
+                    "brandId": 117,
+                    "brandingType": "branded",
+                    "imageUrl": "https://images.gasbuddy.io/b/117.png",
+                    "name": "Esso"
                 },
                 {
-                    "imageUrl": "https://images.gasbuddy.io/b/117.png"
+                    "brandId": 117,
+                    "brandingType": "branded",
+                    "imageUrl": "https://images.gasbuddy.io/b/117.png",
+                    "name": "Esso"
                 }
             ],
+            "amenities": [],
+            "hours": {
+                "openingHours": "Mon-Sun 6am-11pm",
+                "status": "open",
+                "nextIntervals": [
+                    {"open": "06:00", "close": "23:00"}
+                ]
+            },
+            "emergencyStatus": {
+                "hasGas": {"nickname": null, "reportStatus": null, "updateDate": null, "stamp": null},
+                "hasPower": {"nickname": null, "reportStatus": null, "updateDate": null, "stamp": null},
+                "hasDiesel": {"nickname": null, "reportStatus": null, "updateDate": null, "stamp": null}
+            },
             "prices": [
                 {
                     "cash": null,
                     "credit": {
                         "nickname": "qjnw4hgzcn",
                         "postedTime": "2024-09-06T14:42:39.298Z",
-                        "price": 131.9
+                        "price": 131.9,
+                        "formattedPrice": "131.9¢"
                     },
                     "fuelProduct": "regular_gas",
                     "longName": "Regular"
@@ -25,17 +67,17 @@
                     "credit": {
                         "nickname": "arcticwolf",
                         "postedTime": "2024-09-06T12:57:23.068Z",
-                        "price": 149.9
+                        "price": 149.9,
+                        "formattedPrice": "149.9¢"
                     },
                     "fuelProduct": "premium_gas",
                     "longName": "Premium"
                 }
             ],
-            "priceUnit": "cents_per_liter",
-            "currency": "CAD",
-            "id": "197274",
-            "latitude": 53.3066,
-            "longitude": -113.5559
+            "offers": [],
+            "payStatus": {
+                "isPayAvailable": false
+            }
         }
     }
 }

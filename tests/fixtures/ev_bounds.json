@@ -1,0 +1,41 @@
+{
+    "data": {
+        "evStationsByBounds": {
+            "stations": [
+                {
+                    "id": "EV_003",
+                    "stationName": "Tesla Supercharger - Camillus",
+                    "streetAddress": "3450 Milton Ave",
+                    "city": "Camillus",
+                    "state": "NY",
+                    "zip": "13031",
+                    "latitude": 43.051,
+                    "longitude": -76.305,
+                    "distanceMiles": 1.2,
+                    "statusCode": "E",
+                    "evNetwork": "Tesla",
+                    "evNetworkWeb": "https://www.tesla.com/supercharger",
+                    "evLevel1EvseNum": 0,
+                    "evLevel2EvseNum": 0,
+                    "evDcFastNum": 8,
+                    "evPricing": "$0.37/kWh",
+                    "evJ1772ConnectorCount": 0,
+                    "evJ1772PowerOutput": null,
+                    "evCcsConnectorCount": 0,
+                    "evCcsPowerOutput": null,
+                    "evChademoConnectorCount": 0,
+                    "evChademoPowerOutput": null,
+                    "evJ3400ConnectorCount": 8,
+                    "evJ3400PowerOutput": "250kW",
+                    "stationPhone": null,
+                    "accessDaysTime": "24 hours daily",
+                    "accessCode": "public",
+                    "cardsAccepted": "credit card",
+                    "dateLastConfirmed": "2024-11-10"
+                }
+            ],
+            "total": 1,
+            "limit": 200
+        }
+    }
+}

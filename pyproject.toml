@@ -24,7 +24,6 @@ dependencies = [
     "aiofiles",
     "aiohttp",
     "backoff",
-    "requests",
 ]
 
 [project.optional-dependencies]
@@ -35,7 +34,6 @@ test = [
     "pytest-asyncio",
     "pytest-cov",
     "pytest-timeout",
-    "requests-mock",
     "tox",
 ]
 
@@ -78,7 +76,9 @@ ignore = [
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "D101", "D102", "D103"]
+"tests/*" = ["S101", "D101", "D102", "D103", "E501"]
+"examples/*" = ["S101", "D101", "D102", "D103", "T201", "B904"]
+"py_gasbuddy/consts.py" = ["S105"]
 
 [tool.mypy]
 python_version = "3.13"

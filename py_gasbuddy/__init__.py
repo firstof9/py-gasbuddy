@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 import logging
 import re
-from collections.abc import Collection
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Any, cast
 
 import aiohttp
 import backoff
@@ -17,6 +17,11 @@ from .cache import GasBuddyCache
 from .consts import (
     BASE_URL,
     DEFAULT_HEADERS,
+    EV_ALL_NETWORKS,
+    EV_CHARGING_LEVELS,
+    EV_CONNECTOR_TYPES,
+    EV_STATIONS_BOUNDS_QUERY,
+    EV_STATIONS_NEARBY_QUERY,
     GAS_PRICE_QUERY,
     GB_HOME_URL,
     LOCATION_QUERY,
@@ -24,9 +29,31 @@ from .consts import (
     TOKEN,
 )
 from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
+from .models import (
+    EvStation as EvStation,
+)
+from .models import (
+    EvStationResult,
+    GraphQLQuery,
+    LocationSearchResult,
+    PriceServiceResult,
+    StationPrice,
+)
+from .models import (
+    StationSummary as StationSummary,
+)
+from .parsers import (
+    build_discount_map,
+    format_price_node,
+    parse_cursor,
+    parse_ev_stations,
+    parse_location_results,
+    parse_results,
+    parse_trends,
+)
 
 ERROR_TIMEOUT = "Timeout while updating"
-CSRF_TIMEOUT = "Timeout wile getting CSRF tokens"
+CSRF_TIMEOUT = "Timeout while getting CSRF tokens"
 MAX_RETRIES = 5
 _LOGGER = logging.getLogger(__name__)
 CSRF_PATTERN = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
@@ -71,9 +98,7 @@ class GasBuddy:
     @backoff.on_exception(
         backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
     )
-    async def process_request(
-        self, query: dict[str, Collection[str]]
-    ) -> dict[str, Any]:
+    async def process_request(self, query: GraphQLQuery) -> dict[str, Any]:
         """Process API requests."""
         headers = dict(DEFAULT_HEADERS)
         try:
@@ -88,7 +113,9 @@ class GasBuddy:
             json_query: str = json.dumps(query)
             _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
             try:
-                async with session.post(self._url, data=json_query, headers=headers) as response:  # noqa: E501
+                async with session.post(
+                    self._url, data=json_query, headers=headers
+                ) as response:
                     message: dict[str, Any] | Any = {}
                     try:
                         message = await response.text()
@@ -108,14 +135,14 @@ class GasBuddy:
                         _LOGGER.debug("Retrying request...")
                         self._cf_last = False
                     elif response.status != 200:
-                        _LOGGER.error(  # pylint: disable-next=line-too-long
-                            "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
+                        _LOGGER.error(
+                            "An error retrieving data from the server, code: %s\nmessage: %s",  # noqa: E501
                             response.status,
                             message,
                         )
                         message = {"error": message}
                         self._cf_last = False
-                    return message
+                    return message  # type: ignore[return-value]
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
@@ -124,10 +151,10 @@ class GasBuddy:
                 _LOGGER.error("%s", err)
                 message = {"error": err}
 
-        return message
+        return message  # type: ignore[return-value]
 
     @asynccontextmanager
-    async def _get_session(self):
+    async def _get_session(self) -> AsyncIterator[aiohttp.ClientSession]:
         """Yield the active HTTP session, managing its lifecycle.
 
         Yields the injected session unchanged when one was provided at
@@ -144,15 +171,37 @@ class GasBuddy:
             finally:
                 await session.close()
 
+    @staticmethod
+    def _validate_coordinates(lat: float, lon: float) -> None:
+        """Raise ValueError if lat/lon are outside valid WGS-84 ranges."""
+        if not -90 <= lat <= 90:
+            raise ValueError(f"lat must be between -90 and 90, got {lat}")
+        if not -180 <= lon <= 180:
+            raise ValueError(f"lon must be between -180 and 180, got {lon}")
+
     async def location_search(
         self,
         lat: float | None = None,
         lon: float | None = None,
         zipcode: int | None = None,
-    ) -> dict[str, str] | dict[str, Any]:
-        """Return result of location search."""
+        brand_id: int | None = None,
+        fuel: int | None = None,
+        cursor: str | None = None,
+    ) -> LocationSearchResult:
+        """Return stations matching a location search.
+
+        Args:
+            lat: Latitude (requires lon).
+            lon: Longitude (requires lat).
+            zipcode: ZIP/postal code to search.
+            brand_id: Filter by GasBuddy brand ID (e.g. 38 for Costco).
+            fuel: Filter by fuel type integer ID. See FUEL_FILTER_IDS in consts.py
+                (e.g. 1=Regular, 2=Midgrade, 3=Premium, 4=Diesel, 5=E85, 12=UNL88).
+            cursor: Opaque pagination token from a previous call's ``next_cursor``.
+        """
         variables: dict[str, Any] = {}
         if lat is not None and lon is not None:
+            self._validate_coordinates(lat, lon)
             variables = {"maxAge": 0, "lat": lat, "lng": lon}
         elif zipcode is not None:
             variables = {"maxAge": 0, "search": str(zipcode)}
@@ -160,23 +209,42 @@ class GasBuddy:
             _LOGGER.error("Missing search data.")
             raise MissingSearchData
 
-        query = {
+        if brand_id is not None:
+            variables["brandId"] = brand_id
+        if fuel is not None:
+            variables["fuel"] = fuel
+        if cursor is not None:
+            variables["cursor"] = cursor
+
+        query: GraphQLQuery = {
             "operationName": "LocationBySearchTerm",
             "query": LOCATION_QUERY,
             "variables": variables,
         }
 
-        return await self.process_request(query)
+        response = await self.process_request(query)
+        if "error" in response:
+            _LOGGER.error(
+                "An error occurred attempting to retrieve the data: %s",
+                response["error"],
+            )
+            return cast(LocationSearchResult, {"results": [], "next_cursor": None})
+        if "errors" in response:
+            _LOGGER.error(
+                "location_search: GraphQL errors returned: %s",
+                response["errors"],
+            )
+            return cast(LocationSearchResult, {"results": [], "next_cursor": None})
+        return parse_location_results(response)
 
-    async def price_lookup(self) -> dict[str, Any] | None:
+    async def price_lookup(self) -> StationPrice:
         """Return gas price of station_id."""
-        query = {
+        query: GraphQLQuery = {
             "operationName": "GetStation",
             "query": GAS_PRICE_QUERY,
             "variables": {"id": str(self._id)},
         }
 
-        # Parse and format data into easy to use dict
         response = await self.process_request(query)
 
         _LOGGER.debug("price_lookup response: %s", response)
@@ -184,7 +252,7 @@ class GasBuddy:
         if "error" in response.keys():
             message = response["error"]
             _LOGGER.error(
-                "An error occured attempting to retrieve the data: %s",
+                "An error occurred attempting to retrieve the data: %s",
                 message,
             )
             raise LibraryError
@@ -195,35 +263,56 @@ class GasBuddy:
                 try:
                     message = response["errors"][0]["message"]
                 except (IndexError, ValueError, TypeError):
-                    message = "Server side error occured."
+                    message = "Server side error occurred."
             _LOGGER.error(
-                "An error occured attempting to retrieve the data: %s",
+                "An error occurred attempting to retrieve the data: %s",
                 message,
             )
             raise APIError
 
-        data = {}
+        station = response.get("data", {}).get("station")
+        if not station:
+            _LOGGER.error("price_lookup: station payload missing or null in response")
+            raise APIError
+        raw: dict[str, Any] = {
+            "station_id": station["id"],
+            "name": station.get("name") or "",
+            "unit_of_measure": station["priceUnit"],
+            "currency": station["currency"],
+            "latitude": station["latitude"],
+            "longitude": station["longitude"],
+            "image_url": station["brands"][0]["imageUrl"]
+            if station.get("brands")
+            else None,
+            "address": station.get("address") or {},
+            "brands": station.get("brands") or [],
+            "amenities": station.get("amenities") or [],
+            "hours": station.get("hours"),
+            "phone": station.get("phone"),
+            "open_status": station.get("openStatus"),
+            "fuels": station.get("fuels") or [],
+            "star_rating": station.get("starRating"),
+            "ratings_count": station.get("ratingsCount"),
+            "is_fuelman_site": bool(station.get("isFuelmanSite", False)),
+            "has_active_outage": bool(station.get("hasActiveOutage", False)),
+            "enterprise": bool(station.get("enterprise", False)),
+            "emergency_status": station.get("emergencyStatus"),
+            "offers": station.get("offers") or [],
+            "pay_status": bool(
+                (station.get("payStatus") or {}).get("isPayAvailable", False)
+            ),
+        }
 
-        data["station_id"] = response["data"]["station"]["id"]
-        data["unit_of_measure"] = response["data"]["station"]["priceUnit"]
-        data["currency"] = response["data"]["station"]["currency"]
-        data["latitude"] = response["data"]["station"]["latitude"]
-        data["longitude"] = response["data"]["station"]["longitude"]
-        data["image_url"] = None
+        _LOGGER.debug("pre-price data: %s", raw)
 
-        if len(response["data"]["station"]["brands"]) > 0:
-            data["image_url"] = response["data"]["station"]["brands"][0]["imageUrl"]
+        discount_map = build_discount_map(station.get("offers") or [])
+        for price in station.get("prices") or []:
+            fuel_key = price["fuelProduct"]
+            raw[fuel_key] = format_price_node(price, discount_map.get(fuel_key))
 
-        _LOGGER.debug("pre-price data: %s", data)
+        _LOGGER.debug("final data: %s", raw)
 
-        prices = response["data"]["station"]["prices"]
-        for price in prices:
-            index = price["fuelProduct"]
-            data[index] = self._format_price_node(price)
-
-        _LOGGER.debug("final data: %s", data)
-
-        return data
+        return cast(StationPrice, raw)
 
     async def price_lookup_service(
         self,
@@ -231,20 +320,45 @@ class GasBuddy:
         lon: float | None = None,
         zipcode: int | None = None,
         limit: int = 5,
-    ) -> dict[str, Any] | None:
-        """Return gas price of station_id."""
+        brand_id: int | None = None,
+        fuel: int | None = None,
+        cursor: str | None = None,
+    ) -> PriceServiceResult:
+        """Return gas prices for stations near a location.
+
+        Args:
+            lat: Latitude (requires lon).
+            lon: Longitude (requires lat).
+            zipcode: ZIP/postal code to search.
+            limit: Maximum number of stations to return (client-side slice).
+            brand_id: Filter by GasBuddy brand ID (e.g. 38 for Costco).
+            fuel: Filter by fuel type integer ID. See FUEL_FILTER_IDS in consts.py
+                (e.g. 1=Regular, 2=Midgrade, 3=Premium, 4=Diesel, 5=E85, 12=UNL88).
+            cursor: Opaque pagination token from a previous call's ``next_cursor``.
+        """
         variables: dict[str, Any] = {}
         if lat is not None and lon is not None:
+            self._validate_coordinates(lat, lon)
             variables = {"maxAge": 0, "lat": lat, "lng": lon}
         elif zipcode is not None:
             variables = {"maxAge": 0, "search": str(zipcode)}
-        query = {
+        else:
+            _LOGGER.error("Missing search data.")
+            raise MissingSearchData
+
+        if brand_id is not None:
+            variables["brandId"] = brand_id
+        if fuel is not None:
+            variables["fuel"] = fuel
+        if cursor is not None:
+            variables["cursor"] = cursor
+
+        query: GraphQLQuery = {
             "operationName": "LocationBySearchTerm",
             "query": LOCATION_QUERY_PRICES,
             "variables": variables,
         }
 
-        # Parse and format data into easy to use dict
         response = await self.process_request(query)
 
         _LOGGER.debug("price_lookup_service response: %s", response)
@@ -252,57 +366,164 @@ class GasBuddy:
         if "error" in response.keys():
             message = response["error"]
             _LOGGER.error(
-                "An error occured attempting to retrieve the data: %s",
+                "An error occurred attempting to retrieve the data: %s",
                 message,
             )
             raise LibraryError
         if "errors" in response.keys():
-            message = response["errors"]["message"]
+            try:
+                message = response["errors"]["message"]
+            except (ValueError, TypeError):
+                try:
+                    message = response["errors"][0]["message"]
+                except (IndexError, ValueError, TypeError):
+                    message = "Server side error occurred."
             _LOGGER.error(
-                "An error occured attempting to retrieve the data: %s",
+                "An error occurred attempting to retrieve the data: %s",
                 message,
             )
             raise APIError
 
-        result_list = await self._parse_results(response, limit)
+        result_list = parse_results(response, limit)
         _LOGGER.debug("result data: %s", result_list)
-        value: dict[Any, Any] = {}
-        value["results"] = result_list
-        trend_data = await self._parse_trends(response)
+
+        result: PriceServiceResult = {"results": result_list}
+        trend_data = parse_trends(response)
         if trend_data:
-            value["trend"] = trend_data
+            result["trend"] = trend_data
             _LOGGER.debug("trend data: %s", trend_data)
-        return value
+        next_cursor = parse_cursor(response)
+        if next_cursor:
+            result["next_cursor"] = next_cursor
+        return result
 
-    async def _parse_trends(self, response: dict) -> list | None:
-        """Parse API results and return trend dict."""
-        trend_data: list = []
-        for trend in response["data"]["locationBySearchTerm"]["trends"]:
-            current_trend: dict[str, Any] = {}
-            current_trend["average_price"] = trend["today"]
-            current_trend["lowest_price"] = trend["todayLow"]
-            current_trend["area"] = trend["areaName"]
-            trend_data.append(current_trend)
-        return trend_data
+    async def ev_stations_nearby(
+        self,
+        lat: float,
+        lon: float,
+        radius: float = 25,
+        networks: str | None = None,
+        connector_types: str | None = None,
+        charging_levels: str | None = None,
+        access_code: str = "public",
+        limit: int = 50,
+    ) -> EvStationResult:
+        """Return EV charging stations within ``radius`` miles of a coordinate.
 
-    async def _parse_results(self, response: dict, limit: int) -> list:
-        """Parse API results and return price data list."""
-        result_list = []
-        results = response["data"]["locationBySearchTerm"]["stations"]["results"]
+        Args:
+            lat: Latitude of the search centre.
+            lon: Longitude of the search centre.
+            radius: Search radius in miles (default 25).
+            networks: Comma-separated network names; defaults to all known networks.
+            connector_types: Comma-separated connector types (default all).
+            charging_levels: Comma-separated charging levels (default all).
+            access_code: ``"public"`` or ``"private"`` (default ``"public"``).
+            limit: Maximum stations to return (default 50).
+        """
+        self._validate_coordinates(lat, lon)
+        query: GraphQLQuery = {
+            "operationName": "EvStationsSearch",
+            "query": EV_STATIONS_NEARBY_QUERY,
+            "variables": {
+                "latitude": lat,
+                "longitude": lon,
+                "radius": radius,
+                "networks": networks or EV_ALL_NETWORKS,
+                "connectorTypes": connector_types or EV_CONNECTOR_TYPES,
+                "chargingLevels": charging_levels or EV_CHARGING_LEVELS,
+                "accessCode": access_code,
+                "limit": limit,
+            },
+        }
+        response = await self.process_request(query)
+        _LOGGER.debug("ev_stations_nearby response: %s", response)
+        if "error" in response:
+            _LOGGER.error(
+                "An error occurred attempting to retrieve EV station data: %s",
+                response["error"],
+            )
+            raise LibraryError
+        if "errors" in response:
+            try:
+                message = response["errors"][0]["message"]
+            except (IndexError, KeyError, TypeError):
+                message = "Server side error occurred."
+            _LOGGER.error(
+                "An error occurred attempting to retrieve EV station data: %s",
+                message,
+            )
+            raise APIError
+        ev_data = response["data"]["evStationsNearby"]
+        return {
+            "stations": parse_ev_stations(ev_data["stations"] or []),
+            "total": ev_data["total"],
+        }
 
-        for result in results[:limit]:
-            price_data = {}
-            price_data["station_id"] = result["id"]
-            price_data["unit_of_measure"] = result["priceUnit"]
-            price_data["currency"] = result["currency"]
-            price_data["latitude"] = result["latitude"]
-            price_data["longitude"] = result["longitude"]
+    async def ev_stations_by_bounds(
+        self,
+        ne_lat: float,
+        ne_lng: float,
+        sw_lat: float,
+        sw_lng: float,
+        networks: str | None = None,
+        connector_types: str | None = None,
+        charging_levels: str | None = None,
+        access_code: str = "public",
+        limit: int = 200,
+    ) -> EvStationResult:
+        """Return EV charging stations within a bounding box.
 
-            for price in result["prices"]:
-                index = price["fuelProduct"]
-                price_data[index] = self._format_price_node(price)
-            result_list.append(price_data)
-        return result_list
+        Args:
+            ne_lat: North-east corner latitude.
+            ne_lng: North-east corner longitude.
+            sw_lat: South-west corner latitude.
+            sw_lng: South-west corner longitude.
+            networks: Comma-separated network names; defaults to all known networks.
+            connector_types: Comma-separated connector types (default all).
+            charging_levels: Comma-separated charging levels (default all).
+            access_code: ``"public"`` or ``"private"`` (default ``"public"``).
+            limit: Maximum stations to return (default 200).
+        """
+        self._validate_coordinates(ne_lat, ne_lng)
+        self._validate_coordinates(sw_lat, sw_lng)
+        query: GraphQLQuery = {
+            "operationName": "EvStationsByBounds",
+            "query": EV_STATIONS_BOUNDS_QUERY,
+            "variables": {
+                "northEastLat": ne_lat,
+                "northEastLng": ne_lng,
+                "southWestLat": sw_lat,
+                "southWestLng": sw_lng,
+                "networks": networks or EV_ALL_NETWORKS,
+                "connectorTypes": connector_types or EV_CONNECTOR_TYPES,
+                "chargingLevels": charging_levels or EV_CHARGING_LEVELS,
+                "accessCode": access_code,
+                "limit": limit,
+            },
+        }
+        response = await self.process_request(query)
+        _LOGGER.debug("ev_stations_by_bounds response: %s", response)
+        if "error" in response:
+            _LOGGER.error(
+                "An error occurred attempting to retrieve EV station data: %s",
+                response["error"],
+            )
+            raise LibraryError
+        if "errors" in response:
+            try:
+                message = response["errors"][0]["message"]
+            except (IndexError, KeyError, TypeError):
+                message = "Server side error occurred."
+            _LOGGER.error(
+                "An error occurred attempting to retrieve EV station data: %s",
+                message,
+            )
+            raise APIError
+        ev_data = response["data"]["evStationsByBounds"]
+        return {
+            "stations": parse_ev_stations(ev_data["stations"] or []),
+            "total": ev_data["total"],
+        }
 
     @backoff.on_exception(backoff.expo, aiohttp.ClientError, max_tries=MAX_RETRIES)
     async def _get_headers(self) -> None:
@@ -344,29 +565,30 @@ class GasBuddy:
             http_method = getattr(session, method)
             _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:
-                async with http_method(url, json=json_data, headers=DEFAULT_HEADERS) as response:  # noqa: E501
+                async with http_method(
+                    url, json=json_data, headers=DEFAULT_HEADERS
+                ) as response:
                     message: str = ""
                     message = await response.text()
                     if response.status != 200:
-                        _LOGGER.error(  # pylint: disable-next=line-too-long
-                            "An error reteiving data from the server, code: %s\nmessage: %s",  # noqa: E501
+                        _LOGGER.error(
+                            "An error retrieving data from the server, code: %s\nmessage: %s",  # noqa: E501
                             response.status,
                             message,
                         )
                         return
 
-                    # If we're using the solver parse the JSON response
                     if self._solver:
                         message = json.loads(message)["solution"]["response"]
 
                     found = CSRF_PATTERN.search(message)
                     if found is not None:
-                        data = {}
+                        data: dict[str, str] = {}
                         self._tag = found.group(2)
                         data[TOKEN] = self._tag
-                        json_data = json.dumps(data).encode("utf-8")
+                        encoded = json.dumps(data).encode("utf-8")
                         _LOGGER.debug("CSRF token found: %s", self._tag)
-                        await self._cache_manager.write_cache(json_data)
+                        await self._cache_manager.write_cache(encoded)
                     else:
                         _LOGGER.error("CSRF token not found.")
                         raise CSRFTokenMissing
@@ -382,20 +604,3 @@ class GasBuddy:
             else:
                 self._cache_manager = GasBuddyCache()
         await self._cache_manager.clear_cache()
-
-    def _format_price_node(self, price_node: dict) -> dict:
-        """Format a single price node."""
-        # Use 'or {}' to handle cases where the key exists but the value is None
-        credit_data = price_node.get("credit") or {}
-        cash_data = price_node.get("cash") or {}
-
-        # Safe extraction helpers
-        credit_price = credit_data.get("price", 0)
-        cash_price = cash_data.get("price", 0)
-
-        return {
-            "credit": credit_data.get("nickname"),
-            "cash_price": None if cash_price == 0 else cash_price,
-            "price": None if credit_price == 0 else credit_price,
-            "last_updated": credit_data.get("postedTime"),
-        }

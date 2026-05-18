@@ -1,0 +1,69 @@
+{
+    "data": {
+        "locationBySearchTerm": {
+            "stations": {
+                "cursor": {"next": "eyJjdXJzb3IiOiAyMH0="},
+                "results": [
+                    {
+                        "address": {
+                            "country": "US",
+                            "line1": "1520 N Verrado Way",
+                            "line2": null,
+                            "locality": "Buckeye",
+                            "postalCode": "85396",
+                            "region": "AZ"
+                        },
+                        "brands": [
+                            {
+                                "brandId": 23,
+                                "brandingType": "branded",
+                                "imageUrl": "https://images.gasbuddy.io/b/23.png",
+                                "name": "Shell"
+                            }
+                        ],
+                        "distance": 0.4,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"],
+                        "id": "187725",
+                        "latitude": 33.465405037595,
+                        "longitude": -112.505053281784,
+                        "name": "Shell",
+                        "priceUnit": "dollars_per_gallon",
+                        "currency": "USD",
+                        "ratingsCount": 21,
+                        "starRating": 4.1,
+                        "prices": [
+                            {
+                                "cash": null,
+                                "credit": {
+                                    "nickname": "fred1129",
+                                    "postedTime": "2024-11-18T21:58:38.859Z",
+                                    "price": 3.28,
+                                    "formattedPrice": "$3.28"
+                                },
+                                "fuelProduct": "regular_gas",
+                                "longName": "Regular"
+                            }
+                        ],
+                        "offers": []
+                    }
+                ]
+            },
+            "trends": [
+                {
+                    "areaName": "Arizona",
+                    "country": "US",
+                    "today": 3.33,
+                    "todayLow": 2.59,
+                    "trend": 0
+                },
+                {
+                    "areaName": "United States",
+                    "country": "US",
+                    "today": 3.11,
+                    "todayLow": 0,
+                    "trend": -1
+                }
+            ]
+        }
+    }
+}
