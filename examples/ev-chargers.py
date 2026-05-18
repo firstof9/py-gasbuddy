@@ -64,6 +64,10 @@ async def main() -> None:
     args = parse_args()
     if args.lat is not None and args.lon is None:
         raise SystemExit("--lon is required when --lat is provided")
+    if args.lon is not None and args.lat is None:
+        raise SystemExit("--lat is required when --lon is provided")
+    if args.bounds is not None and args.lon is not None:
+        raise SystemExit("--lon cannot be used with --bounds")
 
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.WARNING,
@@ -95,7 +99,7 @@ async def main() -> None:
                 limit=args.limit,
             )
     except (LibraryError, APIError) as e:
-        raise SystemExit(f"Error fetching EV stations: {e}")
+        raise SystemExit(f"Error fetching EV stations: {e}") from e
 
     stations = result["stations"]
     print(f"Found {result['total']} station(s) - showing {len(stations)}:\n")

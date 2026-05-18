@@ -21,6 +21,7 @@ def clear_default_cache():
     if had_cache:
         fd, backup = tempfile.mkstemp(dir=_DEFAULT_CACHE.parent, prefix="token_bak_")
         os.close(fd)
+        os.unlink(backup)
         shutil.move(str(_DEFAULT_CACHE), backup)
     else:
         _DEFAULT_CACHE.unlink(missing_ok=True)
