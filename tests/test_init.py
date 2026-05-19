@@ -864,6 +864,53 @@ async def test_ev_stations_nearby(mock_aioclient):
     assert s["nacs_count"] == 0
     assert s["phone"] == "1-833-632-2778"
     assert s["access_hours"] == "24 hours daily"
+
+    post_req = None
+    for key, reqs in mock_aioclient.requests.items():
+        if key[0] == "POST" and str(key[1]) == TEST_URL:
+            post_req = reqs[0]
+            break
+    assert post_req is not None
+    req_body = json.loads(post_req.kwargs["data"])
+    variables = req_body["variables"]
+    assert variables["latitude"] == 43.045
+    assert variables["longitude"] == -76.308
+    assert "networks" not in variables
+    assert "connectorTypes" not in variables
+    assert "chargingLevels" not in variables
+
+    await manager.clear_cache()
+
+
+async def test_ev_stations_nearby_with_filters(mock_aioclient):
+    """Test ev_stations_nearby with explicit networks, connector types, and charging levels."""
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("ev_nearby.json"))
+    manager = py_gasbuddy.GasBuddy()
+    result = await manager.ev_stations_nearby(
+        lat=43.045,
+        lon=-76.308,
+        networks="Tesla,ChargePoint",
+        connector_types="CHADEMO,TESLA",
+        charging_levels="DCFast,Level2",
+    )
+
+    assert result["total"] == 2
+
+    post_req = None
+    for key, reqs in mock_aioclient.requests.items():
+        if key[0] == "POST" and str(key[1]) == TEST_URL:
+            post_req = reqs[0]
+            break
+    assert post_req is not None
+    req_body = json.loads(post_req.kwargs["data"])
+    variables = req_body["variables"]
+    assert variables["latitude"] == 43.045
+    assert variables["longitude"] == -76.308
+    assert variables["networks"] == "Tesla,ChargePoint"
+    assert variables["connectorTypes"] == "CHADEMO,TESLA"
+    assert variables["chargingLevels"] == "DCFast,Level2"
+
     await manager.clear_cache()
 
 
@@ -908,6 +955,59 @@ async def test_ev_stations_by_bounds(mock_aioclient):
     assert s["dc_fast_count"] == 8
     assert s["ccs_count"] == 0
     assert s["pricing"] == "$0.37/kWh"
+
+    post_req = None
+    for key, reqs in mock_aioclient.requests.items():
+        if key[0] == "POST" and str(key[1]) == TEST_URL:
+            post_req = reqs[0]
+            break
+    assert post_req is not None
+    req_body = json.loads(post_req.kwargs["data"])
+    variables = req_body["variables"]
+    assert variables["northEastLat"] == 43.85
+    assert variables["northEastLng"] == -81.68
+    assert variables["southWestLat"] == 35.55
+    assert variables["southWestLng"] == -115.48
+    assert "networks" not in variables
+    assert "connectorTypes" not in variables
+    assert "chargingLevels" not in variables
+
+    await manager.clear_cache()
+
+
+async def test_ev_stations_by_bounds_with_filters(mock_aioclient):
+    """Test ev_stations_by_bounds with explicit networks, connector types, and charging levels."""
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("ev_bounds.json"))
+    manager = py_gasbuddy.GasBuddy()
+    result = await manager.ev_stations_by_bounds(
+        ne_lat=43.85,
+        ne_lng=-81.68,
+        sw_lat=35.55,
+        sw_lng=-115.48,
+        networks="Tesla,ChargePoint",
+        connector_types="CHADEMO,TESLA",
+        charging_levels="DCFast,Level2",
+    )
+
+    assert result["total"] == 1
+
+    post_req = None
+    for key, reqs in mock_aioclient.requests.items():
+        if key[0] == "POST" and str(key[1]) == TEST_URL:
+            post_req = reqs[0]
+            break
+    assert post_req is not None
+    req_body = json.loads(post_req.kwargs["data"])
+    variables = req_body["variables"]
+    assert variables["northEastLat"] == 43.85
+    assert variables["northEastLng"] == -81.68
+    assert variables["southWestLat"] == 35.55
+    assert variables["southWestLng"] == -115.48
+    assert variables["networks"] == "Tesla,ChargePoint"
+    assert variables["connectorTypes"] == "CHADEMO,TESLA"
+    assert variables["chargingLevels"] == "DCFast,Level2"
+
     await manager.clear_cache()
 
 

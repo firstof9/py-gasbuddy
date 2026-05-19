@@ -17,9 +17,6 @@ from .cache import GasBuddyCache
 from .consts import (
     BASE_URL,
     DEFAULT_HEADERS,
-    EV_ALL_NETWORKS,
-    EV_CHARGING_LEVELS,
-    EV_CONNECTOR_TYPES,
     EV_STATIONS_BOUNDS_QUERY,
     EV_STATIONS_NEARBY_QUERY,
     GAS_PRICE_QUERY,
@@ -421,19 +418,24 @@ class GasBuddy:
             limit: Maximum stations to return (default 50).
         """
         self._validate_coordinates(lat, lon)
+        variables: dict[str, Any] = {
+            "latitude": lat,
+            "longitude": lon,
+            "radius": radius,
+            "accessCode": access_code,
+            "limit": limit,
+        }
+        if networks is not None:
+            variables["networks"] = networks
+        if connector_types is not None:
+            variables["connectorTypes"] = connector_types
+        if charging_levels is not None:
+            variables["chargingLevels"] = charging_levels
+
         query: GraphQLQuery = {
             "operationName": "EvStationsSearch",
             "query": EV_STATIONS_NEARBY_QUERY,
-            "variables": {
-                "latitude": lat,
-                "longitude": lon,
-                "radius": radius,
-                "networks": networks or EV_ALL_NETWORKS,
-                "connectorTypes": connector_types or EV_CONNECTOR_TYPES,
-                "chargingLevels": charging_levels or EV_CHARGING_LEVELS,
-                "accessCode": access_code,
-                "limit": limit,
-            },
+            "variables": variables,
         }
         response = await self.process_request(query)
         _LOGGER.debug("ev_stations_nearby response: %s", response)
@@ -486,20 +488,25 @@ class GasBuddy:
         """
         self._validate_coordinates(ne_lat, ne_lng)
         self._validate_coordinates(sw_lat, sw_lng)
+        variables: dict[str, Any] = {
+            "northEastLat": ne_lat,
+            "northEastLng": ne_lng,
+            "southWestLat": sw_lat,
+            "southWestLng": sw_lng,
+            "accessCode": access_code,
+            "limit": limit,
+        }
+        if networks is not None:
+            variables["networks"] = networks
+        if connector_types is not None:
+            variables["connectorTypes"] = connector_types
+        if charging_levels is not None:
+            variables["chargingLevels"] = charging_levels
+
         query: GraphQLQuery = {
             "operationName": "EvStationsByBounds",
             "query": EV_STATIONS_BOUNDS_QUERY,
-            "variables": {
-                "northEastLat": ne_lat,
-                "northEastLng": ne_lng,
-                "southWestLat": sw_lat,
-                "southWestLng": sw_lng,
-                "networks": networks or EV_ALL_NETWORKS,
-                "connectorTypes": connector_types or EV_CONNECTOR_TYPES,
-                "chargingLevels": charging_levels or EV_CHARGING_LEVELS,
-                "accessCode": access_code,
-                "limit": limit,
-            },
+            "variables": variables,
         }
         response = await self.process_request(query)
         _LOGGER.debug("ev_stations_by_bounds response: %s", response)
