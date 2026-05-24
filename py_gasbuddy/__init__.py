@@ -302,7 +302,9 @@ class GasBuddy:
 
         _LOGGER.debug("pre-price data: %s", raw)
 
-        discount_map = build_discount_map(station.get("offers") or [])
+        discount_map = (
+            build_discount_map(station.get("offers") or []) if raw["pay_status"] else {}
+        )
         for price in station.get("prices") or []:
             fuel_key = price["fuelProduct"]
             raw[fuel_key] = format_price_node(price, discount_map.get(fuel_key))

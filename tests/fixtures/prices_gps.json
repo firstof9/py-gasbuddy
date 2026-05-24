@@ -87,7 +87,8 @@
                                 "types": ["gasbuddy"],
                                 "use": ["banner", "strike", "sort"]
                             }
-                        ]
+                        ],
+                        "payStatus": {"isPayAvailable": true}
                     },
                     {
                         "address": {"country": "US", "line1": "1101 N Verrado Way", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
