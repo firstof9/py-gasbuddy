@@ -122,9 +122,13 @@ def parse_results(response: dict[str, Any], limit: int) -> list[StationPrice]:
             "ratings_count": result.get("ratingsCount"),
             "fuels": result.get("fuels") or [],
         }
-        is_pay_available = bool((result.get("payStatus") or {}).get("isPayAvailable", False))
+        pay_status_obj = result.get("payStatus")
+        is_pay_available = (pay_status_obj is None) or bool(
+            (pay_status_obj or {}).get("isPayAvailable", False)
+        )
         raw["pay_status"] = is_pay_available
-        discount_map = build_discount_map(result.get("offers") or []) if is_pay_available else {}
+        offers = result.get("offers") or []
+        discount_map = build_discount_map(offers) if is_pay_available else {}
         for price in result.get("prices") or []:
             fuel_key = price["fuelProduct"]
             raw[fuel_key] = format_price_node(price, discount_map.get(fuel_key))

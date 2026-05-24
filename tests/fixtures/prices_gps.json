@@ -116,7 +116,9 @@
                                 "fuelProduct": "premium_gas",
                                 "longName": "Premium"
                             }
-                        ]
+                        ],
+                        "offers": [],
+                        "payStatus": {"isPayAvailable": false}
                     },
                     {
                         "address": {"country": "US", "line1": "1419 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},

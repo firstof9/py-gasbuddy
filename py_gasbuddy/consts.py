@@ -429,6 +429,9 @@ query LocationBySearchTerm(
           types
           use
         }
+        payStatus {
+          isPayAvailable
+        }
       }
     }
     trends {

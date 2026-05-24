@@ -295,10 +295,12 @@ class GasBuddy:
             "enterprise": bool(station.get("enterprise", False)),
             "emergency_status": station.get("emergencyStatus"),
             "offers": station.get("offers") or [],
-            "pay_status": bool(
-                (station.get("payStatus") or {}).get("isPayAvailable", False)
-            ),
         }
+
+        pay_status_obj = station.get("payStatus")
+        raw["pay_status"] = (pay_status_obj is None) or bool(
+            (pay_status_obj or {}).get("isPayAvailable", False)
+        )
 
         _LOGGER.debug("pre-price data: %s", raw)
 
