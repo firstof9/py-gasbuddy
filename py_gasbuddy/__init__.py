@@ -295,14 +295,18 @@ class GasBuddy:
             "enterprise": bool(station.get("enterprise", False)),
             "emergency_status": station.get("emergencyStatus"),
             "offers": station.get("offers") or [],
-            "pay_status": bool(
-                (station.get("payStatus") or {}).get("isPayAvailable", False)
-            ),
         }
+
+        pay_status_obj = station.get("payStatus")
+        raw["pay_status"] = (pay_status_obj is None) or bool(
+            (pay_status_obj or {}).get("isPayAvailable", False)
+        )
 
         _LOGGER.debug("pre-price data: %s", raw)
 
-        discount_map = build_discount_map(station.get("offers") or [])
+        discount_map = (
+            build_discount_map(station.get("offers") or []) if raw["pay_status"] else {}
+        )
         for price in station.get("prices") or []:
             fuel_key = price["fuelProduct"]
             raw[fuel_key] = format_price_node(price, discount_map.get(fuel_key))

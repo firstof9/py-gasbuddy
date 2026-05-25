@@ -692,6 +692,33 @@ async def test_price_lookup_service_name_address(mock_aioclient):
     await manager.clear_cache()
 
 
+async def test_price_lookup_service_null_pay_status_flash_deal(mock_aioclient):
+    """Null payStatus object must be treated as deal-eligible (Flash Deal stations)."""
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("prices_gps.json"))
+    manager = py_gasbuddy.GasBuddy()
+    data = await manager.price_lookup_service(lat=33.465, lon=-112.505)
+
+    # TestMart (index 2) has payStatus=null and a 10¢ offer → pay_status True, deal applied
+    flash = next(r for r in data["results"] if r["station_id"] == "999001")
+    assert flash["pay_status"] is True
+    assert flash["regular_gas"]["deal_price"] == pytest.approx(3.10)
+    await manager.clear_cache()
+
+
+async def test_price_lookup_service_false_pay_status_no_deal(mock_aioclient):
+    """payStatus={isPayAvailable:false} must suppress deal pricing (e.g. Costco)."""
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("prices_gps.json"))
+    manager = py_gasbuddy.GasBuddy()
+    data = await manager.price_lookup_service(lat=33.465, lon=-112.505)
+
+    costco = next(r for r in data["results"] if r["station_id"] == "208656")
+    assert costco["pay_status"] is False
+    assert costco["regular_gas"]["deal_price"] is None
+    await manager.clear_cache()
+
+
 async def test_unicode_decode_error(mock_aioclient, caplog):
     """Test UnicodeDecodeError fallback path in process_request."""
     from contextlib import asynccontextmanager
