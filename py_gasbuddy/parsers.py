@@ -121,6 +121,11 @@ def parse_results(response: dict[str, Any], limit: int) -> list[StationPrice]:
             "star_rating": result.get("starRating"),
             "ratings_count": result.get("ratingsCount"),
             "fuels": result.get("fuels") or [],
+            "amenities": result.get("amenities") or [],
+            "has_active_outage": bool(result.get("hasActiveOutage", False)),
+            "hours": result.get("hours"),
+            "open_status": result.get("openStatus"),
+            "phone": result.get("phone") or None,
         }
         pay_status_obj = result.get("payStatus")
         is_pay_available = (pay_status_obj is None) or bool(

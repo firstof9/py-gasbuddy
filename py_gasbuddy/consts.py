@@ -418,6 +418,15 @@ query LocationBySearchTerm(
           fuelProduct
           longName
         }
+        amenities {
+          amenityId
+          name
+        }
+        hasActiveOutage
+        hours {
+          openingHours
+          status
+        }
         offers {
           discounts {
             grades
@@ -431,9 +440,11 @@ query LocationBySearchTerm(
           types
           use
         }
+        openStatus
         payStatus {
           isPayAvailable
         }
+        phone
       }
     }
     trends {
