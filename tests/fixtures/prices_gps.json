@@ -121,6 +121,41 @@
                         "payStatus": {"isPayAvailable": false}
                     },
                     {
+                        "address": {"country": "US", "line1": "100 Test Blvd", "line2": null, "locality": "Springfield", "postalCode": "62701", "region": "IL"},
+                        "brands": [{"brandId": 77, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/77.png", "name": "TestMart"}],
+                        "distance": 0.9,
+                        "fuels": ["regular_gas", "midgrade_gas", "premium_gas"],
+                        "id": "999001",
+                        "latitude": 39.781721,
+                        "longitude": -89.650148,
+                        "name": "TestMart",
+                        "priceUnit": "dollars_per_gallon",
+                        "currency": "USD",
+                        "ratingsCount": 10,
+                        "starRating": 4.0,
+                        "prices": [
+                            {
+                                "cash": null,
+                                "credit": {"nickname": "user123", "postedTime": "2024-11-18T21:58:38.859Z", "price": 3.20, "formattedPrice": "$3.20"},
+                                "fuelProduct": "regular_gas",
+                                "longName": "Regular"
+                            }
+                        ],
+                        "offers": [
+                            {
+                                "discounts": [
+                                    {"grades": ["regular_gas", "midgrade_gas", "premium_gas"], "highlight": "Flash Deal: Save 10¢ per gallon", "pwgbDiscount": "0.10", "receiptDiscount": null}
+                                ],
+                                "duration": 14400,
+                                "highlight": "Flash Deal: Save 10¢ per gallon",
+                                "id": "offer_testmart_001",
+                                "types": ["gasbuddy"],
+                                "use": ["banner", "strike", "sort"]
+                            }
+                        ],
+                        "payStatus": null
+                    },
+                    {
                         "address": {"country": "US", "line1": "1419 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
                         "brands": [{"brandId": 5, "brandingType": "branded", "imageUrl": "https://images.gasbuddy.io/b/5.png", "name": "Chevron"}],
                         "distance": 1.1,

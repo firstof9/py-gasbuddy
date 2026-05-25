@@ -274,6 +274,7 @@ query GetStation($id: ID!) {
         pwgbDiscount
         receiptDiscount
       }
+      duration
       highlight
       id
       types
@@ -424,6 +425,7 @@ query LocationBySearchTerm(
             pwgbDiscount
             receiptDiscount
           }
+          duration
           highlight
           id
           types
