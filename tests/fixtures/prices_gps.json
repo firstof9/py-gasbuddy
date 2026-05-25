@@ -209,7 +209,14 @@
                                 "fuelProduct": "diesel",
                                 "longName": "Diesel"
                             }
-                        ]
+                        ],
+                        "amenities": [{"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": null,
+                        "offers": [],
+                        "openStatus": "open",
+                        "payStatus": null,
+                        "phone": null
                     },
                     {
                         "address": {"country": "US", "line1": "721 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
@@ -249,7 +256,14 @@
                                 "fuelProduct": "diesel",
                                 "longName": "Diesel"
                             }
-                        ]
+                        ],
+                        "amenities": [{"amenityId": "c_store", "name": "C-Store"}, {"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": {"openingHours": "Open 24 Hours", "status": "open"},
+                        "offers": [],
+                        "openStatus": "open",
+                        "payStatus": {"isPayAvailable": true},
+                        "phone": null
                     },
                     {
                         "address": {"country": "US", "line1": "19600 W Indian School Rd", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
@@ -295,7 +309,14 @@
                                 "fuelProduct": "e85",
                                 "longName": "E85"
                             }
-                        ]
+                        ],
+                        "amenities": [{"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": {"openingHours": "Mon-Sun 6am-11pm", "status": "open"},
+                        "offers": [],
+                        "openStatus": "open",
+                        "payStatus": null,
+                        "phone": null
                     }
                 ]
             },
