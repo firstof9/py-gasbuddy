@@ -139,7 +139,7 @@ class GasBuddy:
                         )
                         message = {"error": message}
                         self._cf_last = False
-                    return message  # type: ignore[return-value]
+                    return message
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
@@ -148,7 +148,7 @@ class GasBuddy:
                 _LOGGER.error("%s", err)
                 message = {"error": err}
 
-        return message  # type: ignore[return-value]
+        return message
 
     @asynccontextmanager
     async def _get_session(self) -> AsyncIterator[aiohttp.ClientSession]:
