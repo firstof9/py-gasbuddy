@@ -555,7 +555,11 @@ class GasBuddy:
             if isinstance(cache_data, dict) and TOKEN in cache_data:
                 self._tag = cache_data[TOKEN]
             else:
+                # Cache existed but didn't contain a usable token (corrupt
+                # file, partial write, schema drift). Force a refresh so we
+                # don't POST with an empty CSRF header — that would 403.
                 self._tag = ""
+                self._cf_last = False
         else:
             _LOGGER.debug("No cache file found, creating...")
             self._cf_last = False
