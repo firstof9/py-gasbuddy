@@ -16,7 +16,7 @@ def parse_distance(value: Any) -> float | None:
     """Coerce distance to float, stripping any unit suffix (e.g. '0.37mi')."""
     if value is None:
         return None
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return float(value)
     stripped = "".join(c for c in str(value) if c.isdigit() or c == ".")
     try:
