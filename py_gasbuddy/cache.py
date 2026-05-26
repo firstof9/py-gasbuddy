@@ -36,9 +36,10 @@ class GasBuddyCache:
         file. The asyncio lock further serialises in-process writers.
         """
         async with self._lock:
-            # Create parent directories if they don't exist
-            if not await aiofiles.os.path.exists(self._cache_file.parent):
-                await aiofiles.os.makedirs(self._cache_file.parent)
+            # Create parent directories if they don't exist. Use
+            # exist_ok=True so a racing process that creates the
+            # directory between our check and call doesn't blow up.
+            await aiofiles.os.makedirs(self._cache_file.parent, exist_ok=True)
 
             tmp_path = self._cache_file.with_name(
                 f".{self._cache_file.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp"

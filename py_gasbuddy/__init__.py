@@ -712,8 +712,8 @@ class GasBuddy:
         # the previous holder already populated the token so we don't
         # double-fetch.
         async with self._token_lock:
-            if self._cf_last is True and self._tag:
-                return
+            if self._cf_last is True and self._tag:  # type: ignore[unreachable]
+                return  # type: ignore[unreachable]
 
             _LOGGER.debug("Token invalid, getting a new one...")
             await self._refresh_token(url, method, json_data)
@@ -759,7 +759,12 @@ class GasBuddy:
                         data[TOKEN] = self._tag
                         encoded = json.dumps(data).encode("utf-8")
                         _LOGGER.debug("CSRF token found: %s", self._tag)
-                        await self._cache_manager.write_cache(encoded)
+                        if self._cache_manager is not None:
+                            await self._cache_manager.write_cache(encoded)
+                        # Mark this instance as having a fresh token so
+                        # any coroutine still queued on _token_lock skips
+                        # its own refresh after we release the lock.
+                        self._cf_last = True
                     else:
                         _LOGGER.error("CSRF token not found.")
                         raise CSRFTokenMissing
