@@ -67,15 +67,35 @@ def format_price_node(
     )
 
 
+def _stations_block(response: dict[str, Any]) -> dict[str, Any]:
+    """Return the ``stations`` dict from a locationBySearchTerm response.
+
+    Defensive against the GraphQL spec's allowance of partial responses
+    (``data: null``, missing keys, ``stations`` being null or a non-dict).
+    Returns an empty dict when the expected shape isn't present so callers
+    can downgrade to "no results" rather than crash.
+    """
+    data = response.get("data") or {}
+    location = data.get("locationBySearchTerm") or {}
+    stations = location.get("stations") or {}
+    return stations if isinstance(stations, dict) else {}
+
+
 def parse_cursor(response: dict[str, Any]) -> str | None:
     """Extract the next-page cursor from a locationBySearchTerm response."""
-    stations = response["data"]["locationBySearchTerm"]["stations"]
-    return (stations.get("cursor") or {}).get("next")
+    stations = _stations_block(response)
+    cursor = stations.get("cursor")
+    if not isinstance(cursor, dict):
+        return None
+    return cursor.get("next")
 
 
 def parse_location_results(response: dict[str, Any]) -> LocationSearchResult:
     """Parse location search results into a LocationSearchResult."""
-    stations = response["data"]["locationBySearchTerm"]["stations"]
+    stations = _stations_block(response)
+    raw_results = stations.get("results") or []
+    if not isinstance(raw_results, list):
+        raw_results = []
     results = [
         cast(
             StationSummary,
@@ -91,7 +111,8 @@ def parse_location_results(response: dict[str, Any]) -> LocationSearchResult:
                 "price_unit": r.get("priceUnit"),
             },
         )
-        for r in stations["results"]
+        for r in raw_results
+        if isinstance(r, dict) and "id" in r
     ]
     return cast(
         LocationSearchResult,
@@ -102,7 +123,10 @@ def parse_location_results(response: dict[str, Any]) -> LocationSearchResult:
 def parse_results(response: dict[str, Any], limit: int) -> list[StationPrice]:
     """Parse price-service API results into a StationPrice list."""
     result_list: list[StationPrice] = []
-    results = response["data"]["locationBySearchTerm"]["stations"]["results"]
+    raw_results = _stations_block(response).get("results") or []
+    if not isinstance(raw_results, list):
+        raw_results = []
+    results = [r for r in raw_results if isinstance(r, dict) and "id" in r]
 
     for result in results[:limit]:
         raw: dict[str, Any] = {
@@ -184,11 +208,20 @@ def parse_ev_stations(stations_data: list[dict[str, Any]]) -> list[EvStation]:
 
 def parse_trends(response: dict[str, Any]) -> list[TrendData]:
     """Parse price-service API results into a TrendData list."""
+    data = response.get("data") or {}
+    location = data.get("locationBySearchTerm") or {}
+    trends = location.get("trends") or []
+    if not isinstance(trends, list):
+        return []
     return [
         TrendData(
             average_price=trend["today"],
             lowest_price=trend["todayLow"],
             area=trend["areaName"],
         )
-        for trend in response["data"]["locationBySearchTerm"]["trends"]
+        for trend in trends
+        if isinstance(trend, dict)
+        and "today" in trend
+        and "todayLow" in trend
+        and "areaName" in trend
     ]
