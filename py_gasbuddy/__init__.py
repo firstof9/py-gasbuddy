@@ -285,7 +285,7 @@ class GasBuddy:
             "brands": station.get("brands") or [],
             "amenities": station.get("amenities") or [],
             "hours": station.get("hours"),
-            "phone": station.get("phone"),
+            "phone": station.get("phone") or None,
             "open_status": station.get("openStatus"),
             "fuels": station.get("fuels") or [],
             "star_rating": station.get("starRating"),

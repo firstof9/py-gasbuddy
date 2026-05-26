@@ -77,18 +77,24 @@
                                 "longName": "Diesel"
                             }
                         ],
+                        "amenities": [{"amenityId": "c_store", "name": "C-Store"}, {"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": null,
                         "offers": [
                             {
                                 "discounts": [
                                     {"grades": ["regular_gas", "midgrade_gas", "premium_gas", "diesel"], "highlight": "Flash Deal: Save 10¢ per gallon", "pwgbDiscount": "0.10", "receiptDiscount": null}
                                 ],
+                                "duration": 14400,
                                 "highlight": "Flash Deal: Save 10¢ per gallon",
                                 "id": "offer_shell_001",
                                 "types": ["gasbuddy"],
                                 "use": ["banner", "strike", "sort"]
                             }
                         ],
-                        "payStatus": {"isPayAvailable": true}
+                        "openStatus": "open",
+                        "payStatus": {"isPayAvailable": true},
+                        "phone": "555-111-2222"
                     },
                     {
                         "address": {"country": "US", "line1": "1101 N Verrado Way", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
@@ -117,8 +123,13 @@
                                 "longName": "Premium"
                             }
                         ],
+                        "amenities": [],
+                        "hasActiveOutage": false,
+                        "hours": {"openingHours": "Mon-Fri 10am-8:30pm, Sat 9:30am-6pm, Sun 10am-6pm", "status": "open"},
                         "offers": [],
-                        "payStatus": {"isPayAvailable": false}
+                        "openStatus": "open",
+                        "payStatus": {"isPayAvailable": false},
+                        "phone": "555-333-4444"
                     },
                     {
                         "address": {"country": "US", "line1": "100 Test Blvd", "line2": null, "locality": "Springfield", "postalCode": "62701", "region": "IL"},
@@ -141,6 +152,9 @@
                                 "longName": "Regular"
                             }
                         ],
+                        "amenities": [{"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": null,
                         "offers": [
                             {
                                 "discounts": [
@@ -153,7 +167,9 @@
                                 "use": ["banner", "strike", "sort"]
                             }
                         ],
-                        "payStatus": null
+                        "openStatus": "open",
+                        "payStatus": null,
+                        "phone": null
                     },
                     {
                         "address": {"country": "US", "line1": "1419 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
@@ -193,7 +209,14 @@
                                 "fuelProduct": "diesel",
                                 "longName": "Diesel"
                             }
-                        ]
+                        ],
+                        "amenities": [{"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": null,
+                        "offers": [],
+                        "openStatus": "open",
+                        "payStatus": null,
+                        "phone": null
                     },
                     {
                         "address": {"country": "US", "line1": "721 N 195th Ave", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
@@ -233,7 +256,14 @@
                                 "fuelProduct": "diesel",
                                 "longName": "Diesel"
                             }
-                        ]
+                        ],
+                        "amenities": [{"amenityId": "c_store", "name": "C-Store"}, {"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": {"openingHours": "Open 24 Hours", "status": "open"},
+                        "offers": [],
+                        "openStatus": "open",
+                        "payStatus": {"isPayAvailable": true},
+                        "phone": null
                     },
                     {
                         "address": {"country": "US", "line1": "19600 W Indian School Rd", "line2": null, "locality": "Buckeye", "postalCode": "85396", "region": "AZ"},
@@ -279,7 +309,14 @@
                                 "fuelProduct": "e85",
                                 "longName": "E85"
                             }
-                        ]
+                        ],
+                        "amenities": [{"amenityId": "pay_at_pump", "name": "Pay At Pump"}],
+                        "hasActiveOutage": false,
+                        "hours": {"openingHours": "Mon-Sun 6am-11pm", "status": "open"},
+                        "offers": [],
+                        "openStatus": "open",
+                        "payStatus": null,
+                        "phone": null
                     }
                 ]
             },
