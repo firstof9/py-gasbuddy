@@ -265,7 +265,10 @@ async def test_header_errors(mock_aioclient, caplog):
         body=load_fixture("station.json"),
         repeat=True,
     )
-    await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
+    # A non-200 from the CSRF endpoint must surface as a clean LibraryError
+    # rather than silently proceeding to POST with an empty token.
+    with pytest.raises(py_gasbuddy.LibraryError):
+        await py_gasbuddy.GasBuddy(station_id=205033).price_lookup()
     assert (
         "An error retrieving data from the server, code: 404\nmessage: Not Found"
         in caplog.text
@@ -453,7 +456,8 @@ async def test_cache_json_error(mock_aioclient, caplog, tmp_path):
     with caplog.at_level(logging.DEBUG):
         manager = py_gasbuddy.GasBuddy(station_id=205033, cache_file=cache_file)
         await manager.price_lookup()
-        assert "Invalid JSON data" in caplog.text
+        # cache_exists rejects the garbage file before read_cache is reached
+        assert "Cache file unreadable or not valid JSON" in caplog.text
     await manager.clear_cache()
 
 
@@ -594,6 +598,7 @@ async def test_external_session(mock_aioclient, tmp_path):
                 py_gasbuddy.BASE_URL,
                 data=mock_post.call_args.kwargs["data"],
                 headers=mock_post.call_args.kwargs["headers"],
+                timeout=mock_post.call_args.kwargs["timeout"],
             )
 
         # Session must still be open (not closed by the library)
@@ -624,7 +629,9 @@ async def test_cache_small_file(mock_aioclient, tmp_path, caplog):
     with caplog.at_level(logging.DEBUG):
         await manager.price_lookup()
 
-    assert "Checking cache file size: 19" in caplog.text
+    # Non-JSON cache content is rejected by cache_exists; library falls
+    # through to fetching a fresh token.
+    assert "Cache file unreadable or not valid JSON" in caplog.text
     assert "No cache file found, creating..." in caplog.text
 
 
