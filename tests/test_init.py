@@ -288,11 +288,29 @@ async def test_header_errors(mock_aioclient, caplog):
         body="<html></html>",
     )
     with caplog.at_level(logging.DEBUG):
-        with pytest.raises(py_gasbuddy.LibraryError):
+        # CloudflareBlocked is a LibraryError subclass; we assert the
+        # specific type here and the subclass relationship in a
+        # dedicated test below.
+        with pytest.raises(py_gasbuddy.CloudflareBlocked):
             manager = py_gasbuddy.GasBuddy(station_id=205033)
             await manager.price_lookup()
     assert "CSRF token not found." in caplog.text
     assert "Skipping request due to missing token." in caplog.text
+    await manager.clear_cache()
+
+
+async def test_csrf_block_raises_cloudflare_blocked(mock_aioclient):
+    """A failed CSRF fetch surfaces as CloudflareBlocked (a LibraryError)."""
+    # GET /home returns HTML with no gbcsrf token → CSRFTokenMissing
+    # inside _get_headers → process_request returns the error envelope.
+    mock_aioclient.get(GB_URL, status=200, body="<html></html>", repeat=True)
+    manager = py_gasbuddy.GasBuddy(station_id=205033)
+    with pytest.raises(py_gasbuddy.CloudflareBlocked) as exc_info:
+        await manager.price_lookup()
+    # Subclass relationship — existing except-LibraryError handlers
+    # still catch it, but callers can also catch this specifically.
+    assert isinstance(exc_info.value, py_gasbuddy.LibraryError)
+    assert "Missing Token" in str(exc_info.value)
     await manager.clear_cache()
 
 
