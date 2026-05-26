@@ -1,7 +1,10 @@
 """Cache functions for py-gasbuddy."""
 
+import asyncio
 import json
 import logging
+import os
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -20,15 +23,38 @@ class GasBuddyCache:
             self._cache_file = Path.home() / ".cache" / "py_gasbuddy" / "token"
         else:
             self._cache_file = Path(cache_file)
+        # Serialise cache mutations within a single process. The HA
+        # coordinator + a parallel service call could otherwise race
+        # both reading and writing the same token file.
+        self._lock = asyncio.Lock()
 
     async def write_cache(self, data: Any) -> None:
-        """Write cache file."""
-        # Create parent directories if they don't exist
-        if not await aiofiles.os.path.exists(self._cache_file.parent):
-            await aiofiles.os.makedirs(self._cache_file.parent)
+        """Atomically write the cache file.
 
-        async with aiofiles.open(self._cache_file, mode="wb") as file:
-            await file.write(data)
+        Writes to a uniquely-named sibling tempfile and ``os.replace``s
+        onto the final path, so concurrent writers can't produce a torn
+        file. The asyncio lock further serialises in-process writers.
+        """
+        async with self._lock:
+            # Create parent directories if they don't exist
+            if not await aiofiles.os.path.exists(self._cache_file.parent):
+                await aiofiles.os.makedirs(self._cache_file.parent)
+
+            tmp_path = self._cache_file.with_name(
+                f".{self._cache_file.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp"
+            )
+            try:
+                async with aiofiles.open(tmp_path, mode="wb") as file:
+                    await file.write(data)
+                # os.replace is atomic on POSIX and Windows ≥Vista.
+                await aiofiles.os.replace(tmp_path, self._cache_file)
+            except Exception:
+                # Best-effort cleanup of the tempfile on failure.
+                try:
+                    await aiofiles.os.remove(tmp_path)
+                except OSError:
+                    pass
+                raise
 
     async def read_cache(self) -> Any:
         """Read cache file."""

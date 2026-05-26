@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import re
@@ -131,6 +132,10 @@ class GasBuddy:
         self._cache_manager: GasBuddyCache | None = None
         self._timeout = timeout
         self._session = session
+        # Serialise CSRF refreshes within a single process — without this,
+        # two concurrent callers on a cold cache both GET /home and both
+        # write the token file.
+        self._token_lock = asyncio.Lock()
 
     async def process_request(self, query: GraphQLQuery) -> dict[str, Any]:
         """Process API requests.
@@ -702,8 +707,24 @@ class GasBuddy:
         if self._cf_last is None or self._cf_last:
             return
 
-        _LOGGER.debug("Token invalid, getting a new one...")
+        # Serialise concurrent token-refresh attempts within this
+        # GasBuddy instance. After acquiring the lock, re-check whether
+        # the previous holder already populated the token so we don't
+        # double-fetch.
+        async with self._token_lock:
+            if self._cf_last is True and self._tag:
+                return
 
+            _LOGGER.debug("Token invalid, getting a new one...")
+            await self._refresh_token(url, method, json_data)
+
+    async def _refresh_token(
+        self,
+        url: str,
+        method: str,
+        json_data: Any,
+    ) -> None:
+        """GET /home (or solver) and persist the extracted CSRF token."""
         csrf_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
         async with self._get_session() as session:
             http_method = getattr(session, method)
