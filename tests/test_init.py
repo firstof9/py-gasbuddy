@@ -338,7 +338,10 @@ async def test_retry_logic(mock_aioclient, caplog):
     )
     # Patch asyncio.sleep used by backoff so the test doesn't actually
     # wait through the exponential delay between retries.
-    with caplog.at_level(logging.DEBUG), patch("backoff._async.asyncio.sleep", new=AsyncMock()):
+    with (
+        caplog.at_level(logging.DEBUG),
+        patch("backoff._async.asyncio.sleep", new=AsyncMock()),
+    ):
         with pytest.raises(py_gasbuddy.LibraryError):
             manager = py_gasbuddy.GasBuddy(station_id=205033)
             await manager.price_lookup()
@@ -358,11 +361,14 @@ async def test_retry_succeeds_on_second_attempt(mock_aioclient, caplog):
     mock_aioclient.post(
         TEST_URL,
         status=403,
-        body='<!DOCTYPE html><html><title>Just a moment...</title></html>',
+        body="<!DOCTYPE html><html><title>Just a moment...</title></html>",
     )
     mock_aioclient.post(TEST_URL, status=200, body=load_fixture("station.json"))
 
-    with caplog.at_level(logging.DEBUG), patch("backoff._async.asyncio.sleep", new=AsyncMock()):
+    with (
+        caplog.at_level(logging.DEBUG),
+        patch("backoff._async.asyncio.sleep", new=AsyncMock()),
+    ):
         manager = py_gasbuddy.GasBuddy(station_id=205033)
         data = await manager.price_lookup()
 
