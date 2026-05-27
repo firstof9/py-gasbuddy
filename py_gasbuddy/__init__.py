@@ -140,7 +140,18 @@ class GasBuddy:
                         message = json.loads(message)
                         self._cf_last = True
                     except ValueError:
-                        _LOGGER.warning("Non-JSON response: %s", message)
+                        # Truncate body so Cloudflare interstitial HTML
+                        # doesn't dump multi-KB pages to the HA log.
+                        truncated = (
+                            message
+                            if isinstance(message, str) and len(message) <= 500
+                            else (
+                                f"{message[:500]}... (truncated)"
+                                if isinstance(message, str)
+                                else message
+                            )
+                        )
+                        _LOGGER.warning("Non-JSON response: %s", truncated)
                         message = {"error": message}
                         self._cf_last = False
                     if response.status == 403:
