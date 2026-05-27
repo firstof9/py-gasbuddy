@@ -112,3 +112,16 @@ def test_parse_trends_skips_malformed_entries() -> None:
     result = parse_trends(payload)
     assert len(result) == 1
     assert result[0]["area"] == "A"
+
+
+def test_parse_location_results_results_truthy_non_list() -> None:
+    """A truthy non-list 'results' is coerced to an empty list (not just None)."""
+    payload = {"data": {"locationBySearchTerm": {"stations": {"results": "oops"}}}}
+    result = parse_location_results(payload)
+    assert result["results"] == []
+
+
+def test_parse_trends_truthy_non_list() -> None:
+    """A truthy non-list 'trends' returns an empty list (not just None)."""
+    payload = {"data": {"locationBySearchTerm": {"trends": "oops"}}}
+    assert parse_trends(payload) == []
