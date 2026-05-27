@@ -233,7 +233,7 @@ class GasBuddy:
 
         if response.status != 200:
             _LOGGER.error(
-                "An error retrieving data from the server, code: %s\nmessage: %s",  # noqa: E501
+                "An error retrieving data from the server, code: %s\nmessage: %s",
                 response.status,
                 message,
             )

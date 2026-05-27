@@ -20,7 +20,6 @@ DEFAULT_HEADERS = {
 }
 
 TOKEN = "token"
-TOKEN_SKIP = "Already have token and last call was successful. Skipping token search."
 
 # Fuel product keys returned by the API in the `fuels` list and as PriceNode keys.
 FUEL_PRODUCTS: dict[str, str] = {
@@ -42,24 +41,6 @@ FUEL_FILTER_IDS: dict[str, int] = {
     "e85": 5,
     "unl88": 12,
 }
-
-EV_ALL_NETWORKS = (
-    "7Charge,ABM,AmpedUp_Networks,AmpUp,applegreen_electric,Autel,BC_Hydro,Blink,"
-    "bp_pulse,Chaevi,ChargeLab,ChargeNet,ChargePoint,ChargeSmart_EV,ChargeUP,Chargie,"
-    "CircleK_Charge,CircleK_Couche_Tard_Recharge,Circuit_electrique,DirtRoad,"
-    "eCharge_Network,Electric_Era,Electrify_America,Electrify_Canada,Enel_X_Way,"
-    "EnviroSpark,Epic_Charging,EVBOLT,EV_Connect,EVCS,EvGateway,EVgo,EVIUM_Charging,"
-    "EVmatch,Evoke_Systems,EVPassport,eVPower,EV_Range,EVXY,ezVOLTz,FLASH,Flipturn,"
-    "Flitway,FLO,Ford_Charge,FPL_EVolution,Francis_Energy,GO_TO_U,Graviti_Energy,"
-    "Gravity_Charging_Center,HoneyBadger_Charging,Hwisel,Hyperfuel,InCharge,IONNA,"
-    "Ivy,Jule,Kwik_Charge,Lakeland_EV_CHARGING,Loop,Matcha_Electric,Mercedes_Benz_HPC,"
-    "Non_Networked,Noodoe,OBE_Power,On_the_Run_EV,OpConnect,Petro_Canada,PowerCharge,"
-    "PowerFlex,PowerPort_EVC,PowerPump,QuickCharge,Red_E_Charge,Revel,"
-    "Revitalize_Charging,Rivian_Adventure_Network,Rivian_Waypoints,Rove,SemaConnect,"
-    "Shell_Recharge,Stay_N_Charge,Sun_Country_Highway,SWTCH_Energy,Tesla,"
-    "Tesla_Destination,TurnOnGreen,Universal_EV_Chargers,ViaLynk,Volta,Walmart,"
-    "WattEV,WAVE,Xeal_EV_Charging,ZEF_Network"
-)
 
 EV_CONNECTOR_TYPES = "J1772,J1772COMBO,CHADEMO,TESLA"
 
