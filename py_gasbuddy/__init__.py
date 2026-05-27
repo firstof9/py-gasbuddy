@@ -25,7 +25,13 @@ from .consts import (
     LOCATION_QUERY_PRICES,
     TOKEN,
 )
-from .exceptions import APIError, CSRFTokenMissing, LibraryError, MissingSearchData
+from .exceptions import (
+    APIError,
+    CloudflareBlocked,
+    CSRFTokenMissing,
+    LibraryError,
+    MissingSearchData,
+)
 from .models import (
     EvStation as EvStation,
 )
@@ -52,6 +58,7 @@ from .parsers import (
 __all__ = [
     "APIError",
     "CSRFTokenMissing",
+    "CloudflareBlocked",
     "EvStation",
     "EvStationResult",
     "GasBuddy",
@@ -66,9 +73,27 @@ __all__ = [
 
 ERROR_TIMEOUT = "Timeout while updating"
 CSRF_TIMEOUT = "Timeout while getting CSRF tokens"
+# The sentinel value process_request returns in its error envelope when
+# the CSRF token fetch failed (Cloudflare interstitial, no FlareSolverr,
+# etc.). Callers can pattern-match this, but the preferred way to detect
+# CSRF/Cloudflare blocks is to catch CloudflareBlocked at the public API
+# methods (price_lookup, location_search, ev_stations_nearby, ...).
+ERROR_MISSING_TOKEN = "Missing Token"  # noqa: S105 - not a secret, error sentinel
 MAX_RETRIES = 5
 _LOGGER = logging.getLogger(__name__)
 CSRF_PATTERN = re.compile(r'window\.gbcsrf\s*=\s*(["])(.*?)\1')
+
+
+def _raise_library_error(message: Any) -> None:
+    """Raise the right library exception for a process_request error.
+
+    Routes the well-known CSRF/Cloudflare sentinel to the dedicated
+    ``CloudflareBlocked`` subclass and everything else to the generic
+    ``LibraryError`` — both carry ``message`` as the first arg.
+    """
+    if message == ERROR_MISSING_TOKEN:
+        raise CloudflareBlocked(message)
+    raise LibraryError(message)
 
 
 class GasBuddy:
@@ -117,7 +142,7 @@ class GasBuddy:
             await self._get_headers()
         except CSRFTokenMissing:
             _LOGGER.error("Skipping request due to missing token.")
-            return {"error": "Missing Token"}
+            return {"error": ERROR_MISSING_TOKEN}
 
         headers["gbcsrf"] = self._tag
 
@@ -278,7 +303,7 @@ class GasBuddy:
                 "An error occurred attempting to retrieve the data: %s",
                 message,
             )
-            raise LibraryError
+            _raise_library_error(message)
         if "errors" in response.keys():
             try:
                 message = response["errors"]["message"]
@@ -396,7 +421,7 @@ class GasBuddy:
                 "An error occurred attempting to retrieve the data: %s",
                 message,
             )
-            raise LibraryError
+            _raise_library_error(message)
         if "errors" in response.keys():
             try:
                 message = response["errors"]["message"]
@@ -474,7 +499,7 @@ class GasBuddy:
                 "An error occurred attempting to retrieve EV station data: %s",
                 response["error"],
             )
-            raise LibraryError
+            _raise_library_error(response["error"])
         if "errors" in response:
             try:
                 message = response["errors"][0]["message"]
@@ -545,7 +570,7 @@ class GasBuddy:
                 "An error occurred attempting to retrieve EV station data: %s",
                 response["error"],
             )
-            raise LibraryError
+            _raise_library_error(response["error"])
         if "errors" in response:
             try:
                 message = response["errors"][0]["message"]
