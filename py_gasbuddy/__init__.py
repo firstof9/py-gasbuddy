@@ -132,11 +132,37 @@ class GasBuddy:
         self._timeout = timeout
         self._session = session
 
-    @backoff.on_exception(
-        backoff.expo, aiohttp.ClientError, max_time=60, max_tries=MAX_RETRIES
-    )
     async def process_request(self, query: GraphQLQuery) -> dict[str, Any]:
-        """Process API requests."""
+        """Process API requests.
+
+        Retries up to MAX_RETRIES times on transient `aiohttp.ClientError`
+        (including Cloudflare 403 challenges — see `_do_request`). On
+        exhaustion, returns a `{"error": ...}` dict so callers always see
+        the library's standard error envelope rather than a leaked
+        `aiohttp.ClientError`.
+        """
+        result = await self._do_request(query)
+        if result is None:
+            _LOGGER.error("Request retries exhausted")
+            return {"error": "Retries exhausted"}
+        return result
+
+    @backoff.on_exception(
+        backoff.expo,
+        aiohttp.ClientError,
+        max_time=60,
+        max_tries=MAX_RETRIES,
+        raise_on_giveup=False,
+    )
+    async def _do_request(self, query: GraphQLQuery) -> dict[str, Any] | None:
+        """Single HTTP attempt at the GraphQL POST.
+
+        Wrapped by backoff in `process_request`. May raise
+        `aiohttp.ClientError` to signal a retryable failure (Cloudflare
+        403, network error). When backoff's retry budget is exhausted,
+        the decorator returns `None` (because of `raise_on_giveup=False`)
+        and `process_request` converts that to an error dict.
+        """
         headers = dict(DEFAULT_HEADERS)
         try:
             await self._get_headers()
@@ -157,53 +183,90 @@ class GasBuddy:
                     headers=headers,
                     timeout=request_timeout,
                 ) as response:
-                    message: dict[str, Any] | Any = {}
-                    try:
-                        message = await response.text()
-                    except UnicodeDecodeError:
-                        _LOGGER.debug("Decoding error.")
-                        data = await response.read()
-                        message = data.decode(errors="replace")
-
-                    try:
-                        message = json.loads(message)
-                        self._cf_last = True
-                    except ValueError:
-                        # Truncate body so Cloudflare interstitial HTML
-                        # doesn't dump multi-KB pages to the HA log.
-                        truncated = (
-                            message
-                            if isinstance(message, str) and len(message) <= 500
-                            else (
-                                f"{message[:500]}... (truncated)"
-                                if isinstance(message, str)
-                                else message
-                            )
-                        )
-                        _LOGGER.warning("Non-JSON response: %s", truncated)
-                        message = {"error": message}
-                        self._cf_last = False
-                    if response.status == 403:
-                        _LOGGER.debug("Retrying request...")
-                        self._cf_last = False
-                    elif response.status != 200:
-                        _LOGGER.error(
-                            "An error retrieving data from the server, code: %s\nmessage: %s",  # noqa: E501
-                            response.status,
-                            message,
-                        )
-                        message = {"error": message}
-                        self._cf_last = False
-                    return message
+                    return await self._handle_response(response)
 
             except (TimeoutError, ServerTimeoutError):
                 _LOGGER.error("%s: %s", ERROR_TIMEOUT, self._url)
-                message = {"error": ERROR_TIMEOUT}
+                self._cf_last = False
+                return {"error": ERROR_TIMEOUT}
             except ContentTypeError as err:
                 _LOGGER.error("%s", err)
-                message = {"error": err}
+                # Preserve the exception object in the error envelope so
+                # callers introspecting the response see structured data
+                # rather than a string repr.
+                return {"error": err}
 
-        return message
+    async def _handle_response(
+        self, response: aiohttp.ClientResponse
+    ) -> dict[str, Any]:
+        """Parse a GraphQL POST response and update auth state.
+
+        `_cf_last` policy (unified):
+        - 401/403 → False, clear cache, raise `ClientResponseError` so
+          backoff retries with a fresh CSRF token next pass.
+        - 200 + valid JSON → True (request authenticated and parsed).
+        - 200 + non-JSON (Cloudflare interstitial) → False.
+        - Other 4xx/5xx → leave `_cf_last` alone (server-side, not
+          auth-related).
+        """
+        # Read the body (handles UnicodeDecodeError defensively).
+        try:
+            body_text = await response.text()
+        except UnicodeDecodeError:
+            _LOGGER.debug("Decoding error.")
+            body_text = (await response.read()).decode(errors="replace")
+
+        # 401/403 — token-suspect. Invalidate, clear cache, raise to
+        # trigger backoff retry with a fresh token next attempt.
+        if response.status in (401, 403):
+            self._cf_last = False
+            self._tag = ""
+            if self._cache_manager is not None:
+                await self._cache_manager.clear_cache()
+            _LOGGER.warning(
+                "%d from %s — invalidating CSRF token and retrying",
+                response.status,
+                self._url,
+            )
+            raise aiohttp.ClientResponseError(
+                request_info=response.request_info,
+                history=response.history,
+                status=response.status,
+                message="Cloudflare/auth challenge",
+                headers=response.headers,
+            )
+
+        # Try to parse JSON.
+        message: Any
+        try:
+            message = json.loads(body_text)
+        except ValueError:
+            # Non-JSON body (HTML Cloudflare interstitial / plain-text
+            # server error). Truncate before logging so we don't dump
+            # multi-KB pages at WARNING.
+            truncated = (
+                body_text
+                if len(body_text) <= 500
+                else f"{body_text[:500]}... (truncated)"
+            )
+            _LOGGER.warning("Non-JSON response: %s", truncated)
+            message = {"error": body_text}
+            self._cf_last = False
+        else:
+            if response.status == 200:
+                self._cf_last = True
+
+        if response.status != 200:
+            _LOGGER.error(
+                "An error retrieving data from the server, code: %s\nmessage: %s",
+                response.status,
+                message,
+            )
+            message = {"error": message}
+            # Server-side error (not 401/403, already handled above) —
+            # don't penalise the cached token.
+
+        return cast(dict[str, Any], message)
 
     @asynccontextmanager
     async def _get_session(self) -> AsyncIterator[aiohttp.ClientSession]:

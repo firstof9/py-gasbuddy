@@ -318,7 +318,9 @@ async def test_csrf_block_raises_cloudflare_blocked(mock_aioclient):
 
 
 async def test_retry_logic(mock_aioclient, caplog):
-    """Test retry logic."""
+    """Test retry logic — 403 triggers backoff retry and eventually LibraryError."""
+    from unittest.mock import AsyncMock, patch
+
     mock_aioclient.get(
         GB_URL,
         status=200,
@@ -334,11 +336,38 @@ async def test_retry_logic(mock_aioclient, caplog):
         ),
         repeat=True,
     )
-    with caplog.at_level(logging.DEBUG):
+    # Patch asyncio.sleep used by backoff so the test doesn't actually
+    # wait through the exponential delay between retries.
+    with caplog.at_level(logging.DEBUG), patch("backoff._async.asyncio.sleep", new=AsyncMock()):
         with pytest.raises(py_gasbuddy.LibraryError):
             manager = py_gasbuddy.GasBuddy(station_id=205033)
             await manager.price_lookup()
-    assert "Retrying request..." in caplog.text
+    # The 403 path now raises ClientResponseError so backoff actually
+    # retries. We should see the invalidation warning more than once.
+    assert caplog.text.count("invalidating CSRF token and retrying") >= 2
+    assert "Retries exhausted" in caplog.text
+    await manager.clear_cache()
+
+
+async def test_retry_succeeds_on_second_attempt(mock_aioclient, caplog):
+    """403 once, success second time — backoff should retry and succeed."""
+    from unittest.mock import AsyncMock, patch
+
+    mock_aioclient.get(GB_URL, status=200, body=load_fixture("index.html"), repeat=True)
+    # First POST returns 403 with Cloudflare HTML, second returns valid data.
+    mock_aioclient.post(
+        TEST_URL,
+        status=403,
+        body='<!DOCTYPE html><html><title>Just a moment...</title></html>',
+    )
+    mock_aioclient.post(TEST_URL, status=200, body=load_fixture("station.json"))
+
+    with caplog.at_level(logging.DEBUG), patch("backoff._async.asyncio.sleep", new=AsyncMock()):
+        manager = py_gasbuddy.GasBuddy(station_id=205033)
+        data = await manager.price_lookup()
+
+    assert data["station_id"] == "205033"
+    assert "invalidating CSRF token and retrying" in caplog.text
     await manager.clear_cache()
 
 
