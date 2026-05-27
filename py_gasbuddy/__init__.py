@@ -149,9 +149,13 @@ class GasBuddy:
         async with self._get_session() as session:
             json_query: str = json.dumps(query)
             _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
+            request_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
             try:
                 async with session.post(
-                    self._url, data=json_query, headers=headers
+                    self._url,
+                    data=json_query,
+                    headers=headers,
+                    timeout=request_timeout,
                 ) as response:
                     message: dict[str, Any] | Any = {}
                     try:
@@ -623,12 +627,16 @@ class GasBuddy:
 
         _LOGGER.debug("Token invalid, getting a new one...")
 
+        csrf_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
         async with self._get_session() as session:
             http_method = getattr(session, method)
             _LOGGER.debug("Calling %s with data: %s", url, json_data)
             try:
                 async with http_method(
-                    url, json=json_data, headers=DEFAULT_HEADERS
+                    url,
+                    json=json_data,
+                    headers=DEFAULT_HEADERS,
+                    timeout=csrf_timeout,
                 ) as response:
                     message: str = ""
                     message = await response.text()
@@ -638,7 +646,10 @@ class GasBuddy:
                             response.status,
                             message,
                         )
-                        return
+                        # Raise so callers know the token wasn't refreshed,
+                        # rather than silently proceeding to POST with an
+                        # empty/stale token (which would 403).
+                        raise CSRFTokenMissing
 
                     if self._solver:
                         message = json.loads(message)["solution"]["response"]

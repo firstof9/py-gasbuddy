@@ -47,14 +47,19 @@ class GasBuddyCache:
         return {}
 
     async def cache_exists(self) -> bool:
-        """Return bool if cache exists and contains data."""
+        """Return True if cache file holds a valid token payload."""
         check = await aiofiles.os.path.isfile(self._cache_file)
         _LOGGER.debug("Cache file exists? %s", check)
-        if check:
-            size = await aiofiles.os.path.getsize(self._cache_file)
-            _LOGGER.debug("Checking cache file size: %s", size)
-            return bool(size > 30)
-        return False
+        if not check:
+            return False
+        try:
+            async with aiofiles.open(self._cache_file) as file:
+                contents = await file.read()
+            data = json.loads(contents)
+        except (OSError, json.JSONDecodeError):
+            _LOGGER.debug("Cache file unreadable or not valid JSON")
+            return False
+        return isinstance(data, dict) and bool(data.get("token"))
 
     async def clear_cache(self) -> None:
         """Remove cache file."""
