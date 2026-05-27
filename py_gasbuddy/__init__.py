@@ -461,6 +461,7 @@ class GasBuddy:
         networks: str | None = None,
         connector_types: str | None = None,
         charging_levels: str | None = None,
+        cards_accepted: str | None = None,
         access_code: str = "public",
         limit: int = 50,
     ) -> EvStationResult:
@@ -473,6 +474,8 @@ class GasBuddy:
             networks: Comma-separated network names; defaults to all known networks.
             connector_types: Comma-separated connector types (default all).
             charging_levels: Comma-separated charging levels (default all).
+            cards_accepted: Comma-separated payment cards required (e.g.
+                ``"A,V,M,D"`` for AmEx/Visa/MC/Discover); defaults to no filter.
             access_code: ``"public"`` or ``"private"`` (default ``"public"``).
             limit: Maximum stations to return (default 50).
         """
@@ -490,6 +493,8 @@ class GasBuddy:
             variables["connectorTypes"] = connector_types
         if charging_levels is not None:
             variables["chargingLevels"] = charging_levels
+        if cards_accepted is not None:
+            variables["cardsAccepted"] = cards_accepted
 
         query: GraphQLQuery = {
             "operationName": "EvStationsSearch",
@@ -529,6 +534,7 @@ class GasBuddy:
         networks: str | None = None,
         connector_types: str | None = None,
         charging_levels: str | None = None,
+        cards_accepted: str | None = None,
         access_code: str = "public",
         limit: int = 200,
     ) -> EvStationResult:
@@ -542,6 +548,8 @@ class GasBuddy:
             networks: Comma-separated network names; defaults to all known networks.
             connector_types: Comma-separated connector types (default all).
             charging_levels: Comma-separated charging levels (default all).
+            cards_accepted: Comma-separated payment cards required (e.g.
+                ``"A,V,M,D"`` for AmEx/Visa/MC/Discover); defaults to no filter.
             access_code: ``"public"`` or ``"private"`` (default ``"public"``).
             limit: Maximum stations to return (default 200).
         """
@@ -561,6 +569,8 @@ class GasBuddy:
             variables["connectorTypes"] = connector_types
         if charging_levels is not None:
             variables["chargingLevels"] = charging_levels
+        if cards_accepted is not None:
+            variables["cardsAccepted"] = cards_accepted
 
         query: GraphQLQuery = {
             "operationName": "EvStationsByBounds",
