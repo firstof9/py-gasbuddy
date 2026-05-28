@@ -1198,3 +1198,74 @@ async def test_location_search_pagination(mock_aioclient, caplog, tmp_path):
     result_err = await manager.location_search(zipcode=12345)
     assert result_err["results"] == []
     assert result_err["next_cursor"] is None
+
+
+async def test_cache_write_atomic_failure(tmp_path):
+    """Test that a write failure cleans up the tempfile and propagates the error."""
+    from unittest.mock import patch
+
+    cache_file = tmp_path / "test_cache"
+    cache = py_gasbuddy.cache.GasBuddyCache(str(cache_file))
+
+    # Mock aiofiles.os.replace to fail
+    with patch("aiofiles.os.replace", side_effect=OSError("Atomic replace failed")):
+        with pytest.raises(OSError, match="Atomic replace failed"):
+            await cache.write_cache(b"data")
+
+    # The final cache file should not exist
+    assert not cache_file.exists()
+
+    # The temp files in that directory should also be cleaned up (no tmp files)
+    tmp_files = list(tmp_path.glob(".*.tmp"))
+    assert not tmp_files
+
+
+async def test_token_refresh_concurrency(mock_aioclient):
+    """Test that concurrent token-refresh attempts are serialized and only one HTTP fetch is executed."""
+    import asyncio
+    from unittest.mock import patch
+
+    # Mock GB_HOME_URL response
+    mock_aioclient.get(
+        GB_URL,
+        status=200,
+        body=load_fixture("index.html"),
+    )
+
+    manager = py_gasbuddy.GasBuddy()
+
+    # Track how many times _refresh_token is invoked
+    original_refresh = manager._refresh_token
+    refresh_calls = 0
+
+    async def spy_refresh(*args, **kwargs):
+        nonlocal refresh_calls
+        refresh_calls += 1
+        # Introduce a small sleep to simulate network delay, forcing the concurrency
+        await asyncio.sleep(0.05)
+        await original_refresh(*args, **kwargs)
+
+    with patch.object(manager, "_refresh_token", side_effect=spy_refresh):
+        # Trigger concurrent _get_headers calls
+        await asyncio.gather(
+            manager._get_headers(),
+            manager._get_headers(),
+        )
+
+    # Only one token refresh should have occurred
+    assert refresh_calls == 1
+    await manager.clear_cache()
+
+
+async def test_cache_write_atomic_failure_cleanup_fails(tmp_path):
+    """Test that a write failure propagates correctly even when the tempfile cleanup itself fails with OSError."""
+    from unittest.mock import patch
+
+    cache_file = tmp_path / "test_cache"
+    cache = py_gasbuddy.cache.GasBuddyCache(str(cache_file))
+
+    # Mock replace to fail, and mock remove to fail as well
+    with patch("aiofiles.os.replace", side_effect=OSError("Atomic replace failed")):
+        with patch("aiofiles.os.remove", side_effect=OSError("Remove failed")):
+            with pytest.raises(OSError, match="Atomic replace failed"):
+                await cache.write_cache(b"data")
