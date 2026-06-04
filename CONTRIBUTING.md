@@ -72,8 +72,8 @@ with patch("backoff._async.asyncio.sleep", new=AsyncMock()):
    touch it in small steps with thorough tests.
 3. **Run the full suite + mypy + ruff before pushing.** CI runs all
    three.
-4. **Add tests** for new behavior. Mock the HTTP layer with
-   `aioresponses`, not the `GasBuddy.method` level. Use
+4. **Add tests** for new behavior. Mock the HTTP layer with the
+   custom `mock_aioclient` fixture, not the `GasBuddy.method` level. Use
    `tests/common.py:load_fixture()` for JSON/HTML responses; put new
    fixtures under `tests/fixtures/`.
 5. **Document any public API changes**: `__all__` in `__init__.py` is

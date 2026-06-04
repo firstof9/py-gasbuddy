@@ -30,8 +30,8 @@ py_gasbuddy/
   that aren't gated by CI.
 - **Type checking**: `mypy` (strict mode via `tox -e mypy`). The
   codebase is fully typed, including TypedDicts for GraphQL responses.
-- **Tests**: `pytest` + `pytest-asyncio` + `aioresponses`. The full
-  suite is ~49 tests and runs in under 0.3s.
+- **Tests**: `pytest` + `pytest-asyncio` + custom `aiohttp` mock. The full
+  suite is ~73 tests and runs in under 0.3s.
 
 ```bash
 uv venv --python 3.13
@@ -113,7 +113,7 @@ with patch("backoff._async.asyncio.sleep", new=AsyncMock()):
 
 ### Test mocking convention
 
-Tests use `aioresponses` to mock the HTTP layer — both the GET on
+Tests use a custom `AiohttpClientMock` (in `tests/conftest.py` via the `mock_aioclient` fixture) to mock the HTTP layer — both the GET on
 `gasbuddy.com/home` (for CSRF) and the POST on `/graphql`. **Do not
 mock at the `GasBuddy.method` level** unless you have a reason; the
 HTTP-level mocks exercise more of the real code path.

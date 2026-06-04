@@ -28,7 +28,6 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    "aioresponses",
     "pre-commit",
     "pytest",
     "pytest-asyncio",
