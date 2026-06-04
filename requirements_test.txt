@@ -4,4 +4,5 @@ pytest==9.0.3
 pytest-cov==7.1.0
 pytest-timeout==2.4.0
 pytest-asyncio
-tox==4.54.0
+aioresponses
+tox==4.55.0
