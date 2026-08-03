@@ -251,3 +251,26 @@ def test_parse_ev_stations_non_list_coverage() -> None:
 
     assert parse_ev_stations("not-a-list") == []
     assert parse_ev_stations(None) == []
+
+
+def test_redact_data() -> None:
+    """redact_data redacts sensitive strings, dicts, and lists."""
+    from py_gasbuddy.parsers import redact_data
+
+    assert redact_data(None) is None
+    assert redact_data("") == ""
+    assert redact_data("short") == "***REDACTED***"
+    assert redact_data("very_long_secret_token_value") == "ve***ue"
+    assert redact_data(12345) == 12345
+
+    payload = {
+        "gbcsrf": "my_secret_token_12345",
+        "nested": {"token": "another_token_abc"},
+        "token_list": ["secret_token_123", "public_val"],
+        "normal": "public_data",
+    }
+    redacted = redact_data(payload)
+    assert redacted["gbcsrf"] == "my***45"
+    assert redacted["nested"]["token"] == "an***bc"  # noqa: S105
+    assert redacted["token_list"] == ["se***23", "pu***al"]
+    assert redacted["normal"] == "public_data"

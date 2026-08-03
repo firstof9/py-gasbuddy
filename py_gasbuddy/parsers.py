@@ -260,3 +260,38 @@ def parse_trends(response: dict[str, Any]) -> list[TrendData]:
         and "todayLow" in trend
         and "areaName" in trend
     ]
+
+
+def redact_data(data: Any) -> Any:
+    """Redact sensitive data (such as tokens or credentials) for logging.
+
+    Args:
+        data: A string, dict, or object that may contain sensitive token data.
+
+    Returns:
+        Data with sensitive values redacted.
+    """
+    if data is None:
+        return None
+    if isinstance(data, str):
+        if not data:
+            return ""
+        if len(data) <= 8:
+            return "***REDACTED***"
+        return f"{data[:2]}***{data[-2:]}"
+    if isinstance(data, dict):
+        redacted: dict[str, Any] = {}
+        for key, value in data.items():
+            if any(
+                s in key.lower()
+                for s in ("token", "secret", "password", "gbcsrf", "authorization")
+            ):
+                redacted[key] = redact_data(value)
+            elif isinstance(value, dict | list):
+                redacted[key] = redact_data(value)
+            else:
+                redacted[key] = value
+        return redacted
+    if isinstance(data, list):
+        return [redact_data(item) for item in data]
+    return data

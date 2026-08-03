@@ -54,6 +54,7 @@ from .parsers import (
     parse_location_results,
     parse_results,
     parse_trends,
+    redact_data,
 )
 
 __all__ = [
@@ -179,7 +180,9 @@ class GasBuddy:
 
         async with self._get_session() as session:
             json_query: str = json.dumps(query)
-            _LOGGER.debug("URL: %s\nQuery: %s", self._url, json_query)
+            _LOGGER.debug(
+                "URL: %s\nQuery: %s", self._url, json.dumps(redact_data(query))
+            )
             request_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
             try:
                 async with session.post(
@@ -728,7 +731,7 @@ class GasBuddy:
         csrf_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
         async with self._get_session() as session:
             http_method = getattr(session, method)
-            _LOGGER.debug("Calling %s with data: %s", url, json_data)
+            _LOGGER.debug("Calling %s with data: %s", url, redact_data(json_data))
             try:
                 async with http_method(
                     url,
@@ -758,7 +761,7 @@ class GasBuddy:
                         self._tag = found.group(2)
                         data[TOKEN] = self._tag
                         encoded = json.dumps(data).encode("utf-8")
-                        _LOGGER.debug("CSRF token found: %s", self._tag)
+                        _LOGGER.debug("CSRF token found: %s", redact_data(self._tag))
                         if self._cache_manager is not None:
                             await self._cache_manager.write_cache(encoded)
                         # Mark this instance as having a fresh token so
