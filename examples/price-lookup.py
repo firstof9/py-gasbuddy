@@ -56,7 +56,7 @@ async def main() -> None:
     if data.get("phone"):
         print(f"Phone      : {data['phone']}")
     print(f"Address    : {line1}, {city}, {region}")
-    print(f"GPS        : {data['latitude']}, {data['longitude']}")
+    print("GPS        : [REDACTED]")
     print(f"Currency   : {data['currency']}  |  Unit: {data['unit_of_measure']}")
 
     # Hours / status
