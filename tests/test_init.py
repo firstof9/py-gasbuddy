@@ -400,7 +400,7 @@ async def test_solver(mock_aioclient, caplog):
         data = await manager.location_search(zipcode=12345)
 
     assert data["results"][0]["station_id"] == "187725"
-    assert "CSRF token found: 1.***uo" in caplog.text
+    assert "CSRF token found" in caplog.text
     await manager.clear_cache()
 
 

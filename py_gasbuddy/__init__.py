@@ -71,6 +71,7 @@ __all__ = [
     "PriceServiceResult",
     "StationPrice",
     "StationSummary",
+    "redact_data",
 ]
 
 ERROR_TIMEOUT = "Timeout while updating"
@@ -369,7 +370,7 @@ class GasBuddy:
 
         response = await self.process_request(query)
 
-        _LOGGER.debug("price_lookup response: %s", redact_data(response))
+        _LOGGER.debug("price_lookup response received")
 
         if "error" in response.keys():
             message = response["error"]
@@ -427,7 +428,7 @@ class GasBuddy:
             (pay_status_obj or {}).get("isPayAvailable", False)
         )
 
-        _LOGGER.debug("pre-price data: %s", redact_data(raw))
+        _LOGGER.debug("pre-price data processed")
 
         discount_map = (
             build_discount_map(station.get("offers") or []) if raw["pay_status"] else {}
@@ -436,7 +437,7 @@ class GasBuddy:
             fuel_key = price["fuelProduct"]
             raw[fuel_key] = format_price_node(price, discount_map.get(fuel_key))
 
-        _LOGGER.debug("final data: %s", redact_data(raw))
+        _LOGGER.debug("final data processed")
 
         return cast(StationPrice, raw)
 
@@ -487,7 +488,7 @@ class GasBuddy:
 
         response = await self.process_request(query)
 
-        _LOGGER.debug("price_lookup_service response: %s", redact_data(response))
+        _LOGGER.debug("price_lookup_service response received")
 
         if "error" in response.keys():
             message = response["error"]
@@ -511,13 +512,13 @@ class GasBuddy:
             raise APIError
 
         result_list = parse_results(response, limit)
-        _LOGGER.debug("result data: %s", redact_data(result_list))
+        _LOGGER.debug("result data count: %d", len(result_list))
 
         result: PriceServiceResult = {"results": result_list}
         trend_data = parse_trends(response)
         if trend_data:
             result["trend"] = trend_data
-            _LOGGER.debug("trend data: %s", redact_data(trend_data))
+            _LOGGER.debug("trend data count: %d", len(trend_data))
         next_cursor = parse_cursor(response)
         if next_cursor:
             result["next_cursor"] = next_cursor
@@ -572,7 +573,7 @@ class GasBuddy:
             "variables": variables,
         }
         response = await self.process_request(query)
-        _LOGGER.debug("ev_stations_nearby response: %s", redact_data(response))
+        _LOGGER.debug("ev_stations_nearby response received")
         if "error" in response:
             _LOGGER.error(
                 "An error occurred attempting to retrieve EV station data: %s",
@@ -648,7 +649,7 @@ class GasBuddy:
             "variables": variables,
         }
         response = await self.process_request(query)
-        _LOGGER.debug("ev_stations_by_bounds response: %s", redact_data(response))
+        _LOGGER.debug("ev_stations_by_bounds response received")
         if "error" in response:
             _LOGGER.error(
                 "An error occurred attempting to retrieve EV station data: %s",
@@ -730,7 +731,7 @@ class GasBuddy:
         csrf_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
         async with self._get_session() as session:
             http_method = getattr(session, method)
-            _LOGGER.debug("Calling %s with data: %s", url, redact_data(json_data))
+            _LOGGER.debug("Calling %s", url)
             try:
                 async with http_method(
                     url,
