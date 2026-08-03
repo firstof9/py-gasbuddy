@@ -369,7 +369,7 @@ class GasBuddy:
 
         response = await self.process_request(query)
 
-        _LOGGER.debug("price_lookup response: %s", response)
+        _LOGGER.debug("price_lookup response: %s", redact_data(response))
 
         if "error" in response.keys():
             message = response["error"]
@@ -427,7 +427,7 @@ class GasBuddy:
             (pay_status_obj or {}).get("isPayAvailable", False)
         )
 
-        _LOGGER.debug("pre-price data: %s", raw)
+        _LOGGER.debug("pre-price data: %s", redact_data(raw))
 
         discount_map = (
             build_discount_map(station.get("offers") or []) if raw["pay_status"] else {}
@@ -436,7 +436,7 @@ class GasBuddy:
             fuel_key = price["fuelProduct"]
             raw[fuel_key] = format_price_node(price, discount_map.get(fuel_key))
 
-        _LOGGER.debug("final data: %s", raw)
+        _LOGGER.debug("final data: %s", redact_data(raw))
 
         return cast(StationPrice, raw)
 
@@ -487,7 +487,7 @@ class GasBuddy:
 
         response = await self.process_request(query)
 
-        _LOGGER.debug("price_lookup_service response: %s", response)
+        _LOGGER.debug("price_lookup_service response: %s", redact_data(response))
 
         if "error" in response.keys():
             message = response["error"]
@@ -511,13 +511,13 @@ class GasBuddy:
             raise APIError
 
         result_list = parse_results(response, limit)
-        _LOGGER.debug("result data: %s", result_list)
+        _LOGGER.debug("result data: %s", redact_data(result_list))
 
         result: PriceServiceResult = {"results": result_list}
         trend_data = parse_trends(response)
         if trend_data:
             result["trend"] = trend_data
-            _LOGGER.debug("trend data: %s", trend_data)
+            _LOGGER.debug("trend data: %s", redact_data(trend_data))
         next_cursor = parse_cursor(response)
         if next_cursor:
             result["next_cursor"] = next_cursor
@@ -572,7 +572,7 @@ class GasBuddy:
             "variables": variables,
         }
         response = await self.process_request(query)
-        _LOGGER.debug("ev_stations_nearby response: %s", response)
+        _LOGGER.debug("ev_stations_nearby response: %s", redact_data(response))
         if "error" in response:
             _LOGGER.error(
                 "An error occurred attempting to retrieve EV station data: %s",
@@ -648,7 +648,7 @@ class GasBuddy:
             "variables": variables,
         }
         response = await self.process_request(query)
-        _LOGGER.debug("ev_stations_by_bounds response: %s", response)
+        _LOGGER.debug("ev_stations_by_bounds response: %s", redact_data(response))
         if "error" in response:
             _LOGGER.error(
                 "An error occurred attempting to retrieve EV station data: %s",
