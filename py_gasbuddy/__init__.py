@@ -180,9 +180,8 @@ class GasBuddy:
 
         async with self._get_session() as session:
             json_query: str = json.dumps(query)
-            _LOGGER.debug(
-                "URL: %s\nQuery: %s", self._url, json.dumps(redact_data(query))
-            )
+            operation = query.get("operationName") if isinstance(query, dict) else None
+            _LOGGER.debug("URL: %s (operation: %s)", self._url, operation)
             request_timeout = aiohttp.ClientTimeout(total=self._timeout / 1000)
             try:
                 async with session.post(
