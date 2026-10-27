@@ -13,7 +13,14 @@ Provides three query methods covering single-station detail (prices, hours, amen
 
 ## Installation
 
+It is recommended to install `py-gasbuddy` inside a virtual environment:
+
 ```bash
+# Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install py-gasbuddy
 pip install py-gasbuddy
 ```
 
